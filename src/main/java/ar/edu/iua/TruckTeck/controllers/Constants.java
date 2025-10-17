@@ -34,6 +34,12 @@ public class Constants {
     public static final String URL_PRODUCTS = URL_BASE + "/products";
 
     /**
+     * URL del endpoint de productos.
+     * Construida a partir de {@link #URL_BASE} y la ruta específica "/products".
+     */
+    public static final String URL_TRUCKS = URL_BASE + "/truks";
+
+    /**
     * URL del endpoint de integración.
     * Construida a partir de {@link #URL_BASE} y la ruta específica "/integration".
     */
