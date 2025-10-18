@@ -40,6 +40,12 @@ public class Constants {
     public static final String URL_TRUCKS = URL_BASE + "/trucks";
 
     /**
+     * URL del endpoint de choferes.
+     * Construida a partir de {@link #URL_BASE} y la ruta específica "/drivers".
+     */
+    public static final String URL_DRIVERS = URL_BASE + "/drivers";
+
+    /**
     * URL del endpoint de integración.
     * Construida a partir de {@link #URL_BASE} y la ruta específica "/integration".
     */

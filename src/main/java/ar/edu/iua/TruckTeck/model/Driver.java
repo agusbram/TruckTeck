@@ -23,5 +23,5 @@ public class Driver {
     private long id;
     private String name;
     private String surname;
-    private long documentNumber;
+    private String documentNumber;
 }
