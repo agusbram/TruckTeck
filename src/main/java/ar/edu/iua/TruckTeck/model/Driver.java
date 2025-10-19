@@ -1,5 +1,6 @@
 package ar.edu.iua.TruckTeck.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,5 +24,6 @@ public class Driver {
     private long id;
     private String name;
     private String surname;
+    @Column(name = "document_number")
     private String documentNumber;
 }

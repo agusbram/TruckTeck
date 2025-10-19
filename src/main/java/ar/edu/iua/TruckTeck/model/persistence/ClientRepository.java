@@ -29,9 +29,9 @@ import ar.edu.iua.TruckTeck.model.Client;
 public interface ClientRepository extends JpaRepository<Client, Long> {
     
     /**
-     * Busca un Cliente por su dni.
+     * Busca un Cliente por su nombre.
      *
-     * @param client Numero de documento del Cliente.
+     * @param client nombre del Cliente.
      * @return {@link Optional} que contiene el Cliente si se encuentra, o vacío si no existe.
      */
     @Query("SELECT c FROM Client c WHERE c.companyName = :client")

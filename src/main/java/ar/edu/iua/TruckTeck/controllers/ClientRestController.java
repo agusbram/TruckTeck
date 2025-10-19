@@ -119,7 +119,7 @@ public class ClientRestController {
      *         o un mensaje de error si ocurre una excepción de negocio (HTTP 500)
      *         o si no se encuentra el cliente (HTTP 404).
      */
-    @GetMapping(value = "/by-companyName/{companynName}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/by-companyName/{companyName}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> load(@PathVariable String companyName) {
         try {
             return new ResponseEntity<>(clientBusiness.load(companyName), HttpStatus.OK);

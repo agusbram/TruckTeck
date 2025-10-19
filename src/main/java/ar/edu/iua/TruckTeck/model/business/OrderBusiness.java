@@ -14,6 +14,7 @@ import ar.edu.iua.TruckTeck.model.Truck;
 import ar.edu.iua.TruckTeck.model.business.exceptions.BusinessException;
 import ar.edu.iua.TruckTeck.model.business.exceptions.FoundException;
 import ar.edu.iua.TruckTeck.model.business.exceptions.NotFoundException;
+import ar.edu.iua.TruckTeck.model.persistence.ClientRepository;
 import ar.edu.iua.TruckTeck.model.persistence.OrderRepository;
 import lombok.extern.slf4j.Slf4j;
 
@@ -132,31 +133,55 @@ public class OrderBusiness implements IOrderBusiness {
 
         try {
             Client client = clientBusiness.load(order.getClient().getCompanyName());
-            order.setClient(client);
+            if (client != null)
+                order.setClient(client); 
         } catch(NotFoundException e) {
-            order.setClient(clientBusiness.add(order.getClient()));
+            clientBusiness.add(order.getClient());
+            try {
+            order.setClient(clientBusiness.load(order.getClient().getCompanyName()));
+            } catch (NotFoundException f) {
+            }
         }
+        
 
         try {
             Truck truck = truckBusiness.load(order.getTruck().getDomain());
+            if (truck != null)
             order.setTruck(truck);
         } catch(NotFoundException e) {
-            order.setTruck(truckBusiness.add(order.getTruck()));
+            truckBusiness.add(order.getTruck());
+            try {
+            order.setTruck(truckBusiness.load(order.getTruck().getDomain()));
+            } catch (NotFoundException f) {
+            }
         }
+        
 
         try {
             Product product = productBusiness.load(order.getProduct().getName());
+            if (product != null)
             order.setProduct(product);
         } catch(NotFoundException e) {
-            order.setProduct(productBusiness.add(order.getProduct()));
+            productBusiness.add(order.getProduct());
+            try {
+            order.setProduct(productBusiness.load(order.getProduct().getName()));
+            } catch (NotFoundException f) {
+            }
         }
+        
 
         try {
             Driver driver = driverBusiness.load(order.getDriver().getDocumentNumber());
+            if (driver != null)
             order.setDriver(driver);
         } catch(NotFoundException e) {
-            order.setDriver(driverBusiness.add(order.getDriver()));
+            driverBusiness.add(order.getDriver());
+            try {
+            order.setDriver(driverBusiness.load(order.getDriver().getDocumentNumber()));
+            } catch (NotFoundException f) {
+            }
         }
+        
 
         try {
             return orderDAO.save(order);
