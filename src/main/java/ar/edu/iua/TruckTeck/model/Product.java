@@ -27,6 +27,6 @@ public class Product {
 
     private String description;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = true)
     private String externalCode; // Codigo de SAP para este producto
 }

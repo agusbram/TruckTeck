@@ -27,6 +27,6 @@ public class Client {
 
     private String contactName;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = true)
     private String externalCode; // Codigo de SAP para este cliente
 }

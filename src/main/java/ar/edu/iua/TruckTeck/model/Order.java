@@ -31,6 +31,7 @@ public class Order {
     private long number; // Número de orden (PK)
 
     // ===== Integracion con sistemas externos mediante la logica del cliente =====
+    @Column(unique = true, nullable = true)
     private String externalCode;        // Campo para contemplar los codigos externos del SAP por ejemplo
     private String activationCode;      // Código de 5 dígitos (se genera al registrar tara)
 

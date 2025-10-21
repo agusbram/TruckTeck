@@ -30,6 +30,6 @@ public class Driver {
     @Column(name = "document_number")
     private String documentNumber;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = true)
     private String externalCode; // Codigo de SAP para este chofer
 }

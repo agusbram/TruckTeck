@@ -30,7 +30,7 @@ public class Truck {
 
     private int[] cisterns;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = true)
     private String externalCode; // Codigo de SAP para este camion
 
 }
