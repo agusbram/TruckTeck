@@ -46,4 +46,10 @@ public interface DriverRepository extends JpaRepository<Driver, Long> {
     @Query("SELECT p FROM Driver p WHERE p.documentNumber = :driver AND p.id <> :id")
     Optional<Driver> findByDocumentNumberAndIdNot(@Param("driver") String driver, @Param("id") long id);
 
+    /**
+     * Busca un Chofer por su código externo.
+     * @param externalCode
+     * @return
+     */
+    Optional<Driver> findByExternalCode(String externalCode);
 }

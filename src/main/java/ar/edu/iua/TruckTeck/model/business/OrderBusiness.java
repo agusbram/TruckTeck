@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import ar.edu.iua.TruckTeck.model.Client;
 import ar.edu.iua.TruckTeck.model.Driver;
 import ar.edu.iua.TruckTeck.model.Order;
@@ -168,7 +167,6 @@ public class OrderBusiness implements IOrderBusiness {
             } catch (NotFoundException f) {
             }
         }
-        
 
         try {
             Driver driver = driverBusiness.load(order.getDriver().getDocumentNumber());
@@ -181,7 +179,6 @@ public class OrderBusiness implements IOrderBusiness {
             } catch (NotFoundException f) {
             }
         }
-        
 
         try {
             return orderDAO.save(order);
@@ -212,8 +209,13 @@ public class OrderBusiness implements IOrderBusiness {
             return orderDAO.save(order);
         } catch(Exception e) {
             log.error(e.getMessage(), e);
-            throw BusinessException.builder().ex(e).build();
+            throw BusinessException.builder().message("Error al Actualizar Orden").ex(e).build();
         }
+    }
+
+    @Override
+    public void delete(Order order) throws BusinessException, NotFoundException {
+        delete(order.getNumber());
     }
 
     /**
@@ -233,5 +235,4 @@ public class OrderBusiness implements IOrderBusiness {
             throw BusinessException.builder().ex(e).build();
         }
     }
-    
 }

@@ -18,12 +18,18 @@ import lombok.Setter;
 @Entity
 @Table(name = "drivers")
 public class Driver {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
     private String name;
+
     private String surname;
+
     @Column(name = "document_number")
     private String documentNumber;
+
+    @Column(unique = true, nullable = true)
+    private String externalCode; // Codigo de SAP para este chofer
 }

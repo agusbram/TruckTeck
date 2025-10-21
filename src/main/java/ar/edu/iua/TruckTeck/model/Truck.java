@@ -18,12 +18,19 @@ import lombok.Setter;
 @Entity
 @Table(name = "trucks")
 public class Truck {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
     @Column(unique = true)
     private String domain;
+
     private String description;
+
     private int[] cisterns;
+
+    @Column(unique = true, nullable = true)
+    private String externalCode; // Codigo de SAP para este camion
 
 }

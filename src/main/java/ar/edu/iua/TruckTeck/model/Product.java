@@ -1,5 +1,6 @@
 package ar.edu.iua.TruckTeck.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,9 +18,15 @@ import lombok.Setter;
 @Entity
 @Table(name = "products")
 public class Product {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
     private String name;
+
     private String description;
+
+    @Column(unique = true, nullable = true)
+    private String externalCode; // Codigo de SAP para este producto
 }

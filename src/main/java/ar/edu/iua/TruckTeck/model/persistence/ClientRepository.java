@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import ar.edu.iua.TruckTeck.model.Client;
+import ar.edu.iua.TruckTeck.model.Truck;
 
 /**
  * Repositorio para la gestión de la persistencia de {@link client}.
@@ -48,4 +49,10 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
     @Query("SELECT c FROM Client c WHERE c.companyName = :client AND c.id <> :id")
     Optional<Client> findByCompanyNameAndIdNot(@Param("client") String client, @Param("id") long id);
 
+    /**
+     * Busca un Cliente por su código externo.
+     * @param externalCode
+     * @return
+     */
+    Optional<Truck> findByExternalCode(String externalCode);
 }

@@ -46,4 +46,10 @@ public interface TruckRepository extends JpaRepository<Truck, Long> {
     @Query("SELECT t FROM Truck t WHERE t.domain = :truck AND t.id <> :id")
     Optional<Truck> findByDomainAndIdNot(@Param("truck") String truck, @Param("id") long id);
 
+    /**
+     * Busca un Camion por su código externo.
+     * @param externalCode
+     * @return
+     */
+    Optional<Truck> findByExternalCode(String externalCode);
 }
