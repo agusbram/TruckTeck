@@ -38,6 +38,15 @@ public interface IOrderBusiness {
     public Order add(Order order) throws BusinessException, FoundException;
 
     /**
+     * Elimina una orden del sistema.
+     *
+     * @param order orden a eliminar.
+     * @throws BusinessException Si ocurre un error en la lógica de negocio.
+     * @throws NotFoundException Si la orden a eliminar no existe.
+     */
+    public void delete(Order order) throws BusinessException, NotFoundException;
+
+    /**
      * Actualiza los datos de una orden existente.
      *
      * @param order orden con los datos actualizados.
