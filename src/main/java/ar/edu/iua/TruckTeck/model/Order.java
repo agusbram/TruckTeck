@@ -3,6 +3,7 @@ package ar.edu.iua.TruckTeck.model;
 import java.time.LocalDateTime;
 
 import ar.edu.iua.TruckTeck.model.enums.OrderState;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -22,133 +23,60 @@ import lombok.Setter;
 @Entity
 @Table(name = "orders")
 public class Order {
-    @ManyToOne
-    @JoinColumn(name = "driver_id", nullable = false)
-    private Driver driver;
-
-    @ManyToOne
-    @JoinColumn(name = "client_id", nullable = false)
-    private Client client;
-
-    @ManyToOne
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
-
-    @ManyToOne
-    @JoinColumn(name = "truck_id", nullable = false)
-    private Truck truck;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long number;
+    private long number; // Número de orden (PK)
 
-    // Momento en que se recibe la orden desde el sistema externo
-    private LocalDateTime initialReception;
+    // ======== Relaciones con otras Entidades ========
+    @ManyToOne
+    @JoinColumn(name = "driver", nullable = false)
+    private Driver driver;
 
-    // Registro del pesaje vacío (tara)
-    private LocalDateTime initialWeighing;
+    @ManyToOne
+    @JoinColumn(name = "client", nullable = false)
+    private Client client;
 
-    // Momento del primer registro válido de detalle
-    private LocalDateTime startLoading;
+    @ManyToOne
+    @JoinColumn(name = "product", nullable = false)
+    private Product product;
 
-    // Momento del último registro válido de detalle
-    private LocalDateTime endLoading;
+    @ManyToOne
+    @JoinColumn(name = "truck", nullable = false)
+    private Truck truck;
 
-    // Momento de recepción del pesaje final
-    private LocalDateTime endWeighing;
+    // ======= Datos base ========
+    private LocalDateTime scheduledDate;    // Fecha prevista de carga
+    private Double preset;                  // Kg a cargar
 
-    @Enumerated(EnumType.STRING)
-    private OrderState state;
+    // ==== Timestamps del Proceso ====
+    private LocalDateTime initialReception;      // Cuando se recibe la orden (Estado 1)
+    private LocalDateTime initialWeighing;       // Cuando se registra tara (Estado 2)
+    private LocalDateTime startLoading;          // Primer dato válido de carga
+    private LocalDateTime endLoading;            // Último dato válido de carga
+    private LocalDateTime endWeighing;           // Cuando se registra pesaje final (Estado 4)
+    private LocalDateTime finalDataReception;    // Último dato recibido
 
-    // A partir de abajo se muestran los datos que se irán mostrando en tiempo real, reflejando el último registro recibido
-    private float accumulatedMass;
+    // ======= Pesajes =========
+    private Double initialWeight;  // Tara (pesaje vacío)
+    private Double finalWeight;    // Pesaje final (con carga)
 
-    private float density;
-
-    private float temperature;
-
-    private float caudal;
-
-    private LocalDateTime finalDataReception;
-
-    /**
-     * 
-     * Cambiar el estado de la orden usando el valor del enum.
-     * @param newStatus valor del enum a establecer
-     */
-    public void setStatus(OrderState newStatus) {
-        this.state = newStatus;
-    }
-
-    /**
-     * Establece el estado inicial de la orden como PENDING al crear una nueva instancia.
-     */
-    public Order() {
-        this.state = OrderState.PENDING;
-    }
-
-    /**
-     * Cambia el estado de la orden si la transición es válida.
-     * Esto permite únicamente cambiar a un estado de orden específico según el orden lógico que debería seguir.
-     * @param nextState el nuevo estado al que se desea cambiar
-     */
-    public void changeState(OrderState nextState) {
-        if (state.canTransitionTo(nextState)) {
-            this.state = nextState;
-        } else {
-            throw new IllegalStateException(
-                "Invalid transition: " + state + " -> " + nextState
-            );
-        }
-    }
-
-    /**
-     * Configurador compatible con versiones anteriores que acepta los antiguos códigos de cadena  
-     * ("INICIADO", "PESANDO", "CARGANDO", "FINALIZADO") y los asigna * al código correspondiente {@link OrderState}.
-     * @param newStatus codigo string
-     */
-    /* public void setStatusFromString(String newStatus) {
-        if (newStatus == null) {
-            this.state = null;
-            return;
-        }
-        switch (newStatus.toUpperCase()) {
-            case "INICIADA":
-                this.state = OrderState.PENDING;
-                break;
-            case "PESAJE":
-                this.state = OrderState.TARA_REGISTERED;
-                break;
-            case "CARGA":
-                this.state = OrderState.LOADING;
-                break;
-            case "FINALIZADA":
-                this.state = OrderState.FINALIZED;
-                break;
-            default:
-                throw new IllegalArgumentException("Estado no válido: " + newStatus);
-        }
-    } */
-
-    /**
-     * Etiqueta intuitiva para el estado actual. 
-     * @return muestra la cadena o es nula
-     */
-    /* public String getStatusDisplay() {
-        if (this.state == null) return null;
-        switch (this.state) {
-            case PENDING:
-                return "Iniciado";
-            case TARA_REGISTERED:
-                return "Tara";
-            case LOADING:
-                return "Carga";
-            case FINALIZED:
-                return "Finalizado";
-            default:
-                return this.state.name();
-        }
-    } */
-
+    // ======= Últimos valores de carga (cabecera) =======
+    private Double accumulatedMass;  // Última masa acumulada recibida
+    private Double density;          // Última densidad
+    private Double temperature;      // Última temperatura
+    private Double caudal;           // Último caudal
     
+    // ======= Control de estado =======
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private OrderState state = OrderState.PENDING; // Estado inicial de la orden por defecto
+    /**
+     * Caso contrario para no usar un estado por defecto, se puede crear el objeto sin declarar:
+     *
+     * @Schema(hidden = true)
+     * @Enumerated(EnumType.STRING)
+     * @Column()
+     * private OrderState status;
+     */
 }
