@@ -20,5 +20,6 @@ public interface IStandardResponseBusiness {
      * @param message Mensaje descriptivo que acompañará la respuesta, puede ser {@code null}.
      * @return Una instancia de {@link StandardResponse} con la información de estado, mensaje y excepción.
      */
-    public StandardResponse build(HttpStatus httpStatus, Throwable ex, String message);
+    public StandardResponse<?> build(HttpStatus httpStatus, Throwable ex, String message);
+
 }

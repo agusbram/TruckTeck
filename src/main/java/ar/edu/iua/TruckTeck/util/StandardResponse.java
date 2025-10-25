@@ -1,6 +1,8 @@
 package ar.edu.iua.TruckTeck.util;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -32,7 +34,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class StandardResponse {
+public class StandardResponse<T> {
     /**
      * Mensaje descriptivo de la respuesta.
      * <p>
@@ -41,6 +43,12 @@ public class StandardResponse {
      * </p>
      */
     private String message;
+
+    /**
+     * Datos de la respuesta (payload).
+     * Se incluye en respuestas exitosas que devuelven información.
+     */
+    private T data;
 
     /**
      * Excepción asociada a la respuesta, si la hubiera.
@@ -87,7 +95,10 @@ public class StandardResponse {
     public String getDevInfo() {
         if(devInfoEnabled) {
             if(ex != null) {
-                return ExceptionUtils.getStackTrace(ex);
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                ex.printStackTrace(pw);
+                return sw.toString();
             } else {
                 return "No stack trace";
             }

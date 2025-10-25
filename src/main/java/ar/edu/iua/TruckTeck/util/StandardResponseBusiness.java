@@ -44,8 +44,8 @@ public class StandardResponseBusiness implements IStandardResponseBusiness{
      *         y con la información de desarrollo habilitada según la configuración.
      */
     @Override
-    public StandardResponse build(HttpStatus httpStatus, Throwable ex, String message) {
-        StandardResponse sr = new StandardResponse();
+    public StandardResponse<?> build(HttpStatus httpStatus, Throwable ex, String message) {
+        StandardResponse<?> sr = new StandardResponse<>();
         sr.setDevInfoEnabled(devInfoEnabled);
         sr.setMessage(message);
         sr.setHttpStatus(httpStatus);
