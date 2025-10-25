@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> {
     
     // Obtener todos los detalles de una orden, ordenados por timestamp
-    List<OrderDetail> findByOrderNumberOrderByTimestampAsc(Long orderNumber);
+    /* List<OrderDetail> findByOrderNumberOrderByTimestampAsc(Long orderNumber);
     
     // Obtener el último detalle (para saber la masa acumulada final)
     @Query("SELECT od FROM OrderDetail od WHERE od.order.number = :orderNumber ORDER BY od.timestamp DESC LIMIT 1")
@@ -27,5 +27,5 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
     Double calculateAvgDensity(@Param("orderNumber") Long orderNumber);
     
     @Query("SELECT AVG(od.caudal) FROM OrderDetail od WHERE od.order.number = :orderNumber")
-    Double calculateAvgCaudal(@Param("orderNumber") Long orderNumber);
+    Double calculateAvgCaudal(@Param("orderNumber") Long orderNumber); */
 }

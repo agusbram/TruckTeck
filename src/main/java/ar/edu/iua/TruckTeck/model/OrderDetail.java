@@ -33,7 +33,7 @@ public class OrderDetail {
     private long id; // ID del detalle (PK)
 
     @ManyToOne
-    @JoinColumn(name = "order_number", nullable = false)
+    @JoinColumn(name = "order_id", nullable = false)
     private Order order; // Orden a la que pertenece este detalle
 
     @Column(nullable = false)

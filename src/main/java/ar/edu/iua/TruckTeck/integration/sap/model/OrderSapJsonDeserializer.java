@@ -1,18 +1,19 @@
 package ar.edu.iua.TruckTeck.integration.sap.model;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
-import ar.edu.iua.TruckTeck.integration.sap.model.business.IOrderBusinessSap;
 import ar.edu.iua.TruckTeck.model.Client;
 import ar.edu.iua.TruckTeck.model.Driver;
 import ar.edu.iua.TruckTeck.model.Order;
+import ar.edu.iua.TruckTeck.model.Product;
+import ar.edu.iua.TruckTeck.model.Truck;
 import ar.edu.iua.TruckTeck.util.JsonUtiles;
 
 public class OrderSapJsonDeserializer extends StdDeserializer<Order> {
@@ -21,55 +22,48 @@ public class OrderSapJsonDeserializer extends StdDeserializer<Order> {
      *
      * @param vc Clase de la entidad a deserializar.
      */
-	protected OrderSapJsonDeserializer(Class<?> vc) {
+	public OrderSapJsonDeserializer(Class<?> vc) {
 		super(vc);
 	}
-
-    /**
-     * Componente de negocio de órdenes SAP.
-     * <p>
-     * Se utiliza para validar y cargar la orden indicada en el JSON,
-     * en caso de estar presente.
-     * </p>
-     */
-    private IOrderBusinessSap orderBusinessSap;
-
-
-    /**
-     * Constructor que inicializa el deserializador con acceso al
-     * componente de negocio de categorías.
-     *
-     * @param vc               Clase de la entidad a deserializar.
-     * @param orderBusinessSap Servicio de negocio para validación de órdenes SAP.
-     */
-	public OrderSapJsonDeserializer(Class<?> vc, IOrderBusinessSap orderBusinessSap) {
-		super(vc);
-		this.orderBusinessSap = orderBusinessSap;
-	}
-
+    
     public Order deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JacksonException {
         Order order = new Order();
         JsonNode node = jp.getCodec().readTree(jp);
-        ObjectMapper mapper = (ObjectMapper) jp.getCodec();
         
-        String number = JsonUtiles.getString(node, "order,number,id,order_number,order_id,id_order,number_id".split(","), null);
+        String number = JsonUtiles.getString(node, "order,number,order_number".split(","), null);
         String externalCode = JsonUtiles.getString(node, "external_code,code,externalCode".split(","), null);
         
-        // Deserializacion del Driver
-        JsonNode driverNode = node.get("driver");
-        if (driverNode != null && !driverNode.isNull()) {
-            Driver driver = mapper.treeToValue(driverNode, Driver.class);
-            order.setDriver(driver);
-        }
+        Driver driver = JsonUtiles.getDriver(node, "driver,chofer,conductor".split(","), null);
 
-        // Deserializacion del Cliente
-        JsonNode clientNode = node.get("client");
-        if (clientNode != null && !clientNode.isNull()) {
-            Client client = mapper.treeToValue(clientNode, Client.class);
-            order.setClient(client);
-        }
+        // JsonNode nodeAux = JsonUtiles.getDriver(node, "driver,chofer,conductor".split(","), null);
 
-        
+        /* Driver driver = new Driver();
+        driver.setId(JsonUtiles.getLong(nodeAux,"driver_id,id_driver".split(","), 0L));
+        driver.setName(JsonUtiles.getString(nodeAux,"name,nombre".split(","), null));
+        driver.setSurname(JsonUtiles.getString(nodeAux,"surname,apellido".split(","), null));
+        driver.setDocumentNumber(JsonUtiles.getString(nodeAux,"document_number,dni,documento".split(","), null));
+        driver.setExternalCode(JsonUtiles.getString(nodeAux,"externalCodeDriver,external_code_driver,codigo_sap_driver".split(","), null)); */
 
+        Client client = JsonUtiles.getClient(node, "client,cliente".split(","), null);
+
+        Truck truck = JsonUtiles.getTruck(node, "truck,camion".split(","), null);
+
+        Product product = JsonUtiles.getProduct(node, "product,producto,order_product,product_order".split(","), null);
+
+        LocalDateTime scheduledDate = JsonUtiles.getLocalDateTime(node, "scheduled_date,scheduledDate,date_scheduled,dateScheduled".split(","), LocalDateTime.now());
+
+        Double preset = JsonUtiles.getDouble(node, "preset,pre_set,preSet".split(","), 0.0);
+
+
+        order.setNumber(number);
+        order.setExternalCode(externalCode);
+        order.setDriver(driver);
+        order.setClient(client);
+        order.setTruck(truck);
+        order.setProduct(product);
+        order.setScheduledDate(scheduledDate);
+        order.setPreset(preset);
+
+        return order;
     }
 }
