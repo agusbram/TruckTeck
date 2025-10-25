@@ -96,7 +96,7 @@ public final class JsonUtiles {
  	* @param defaultValue  Valor por defecto a retornar si no se encuentra ningún objeto válido.
  	* @return Una instancia de {@link Driver} construida a partir del JSON o {@code defaultValue} si no se encuentra.
  	*/
-	public static Driver getDriver(JsonNode node, String[] attrs, Driver defaultValue) {
+	public static JsonNode getNode(JsonNode node, String[] attrs, JsonNode defaultValue) {
 		JsonNode targetNode = null;
 
         for (String attr : attrs) {
@@ -108,119 +108,8 @@ public final class JsonUtiles {
 		if(targetNode == null) {
 			return defaultValue;
 		}
-		Driver driver = new Driver();
-        driver.setId(JsonUtiles.getLong(targetNode,"driver_id,id_driver".split(","), 0L));
-        driver.setName(JsonUtiles.getString(targetNode,"name,nombre".split(","), null));
-        driver.setSurname(JsonUtiles.getString(targetNode,"surname,apellido".split(","), null));
-        driver.setDocumentNumber(JsonUtiles.getString(targetNode,"document_number,dni,documento".split(","), null));
-        driver.setExternalCode(JsonUtiles.getString(targetNode,"externalCodeDriver,external_code_driver,codigo_sap_driver".split(","), null));
-		return driver;
-	}
-
-	/**
- 	* Construye un objeto {@link Client} a partir de un nodo JSON.
- 	*
- 	* <p>La búsqueda del subobjeto se realiza en el orden de los atributos definidos
- 	* en el arreglo {@code attrs}. El primero encontrado y válido será utilizado
- 	* para construir la instancia.</p>
- 	*
- 	* <p>Si no se encuentra ningún nodo válido, se devuelve el valor por defecto
- 	* especificado en {@code defaultValue}.</p>
- 	*
- 	* @param node          El nodo JSON raíz desde el cual se buscará el subobjeto.
- 	* @param attrs         Lista de nombres de atributos que pueden contener el objeto {@link Client}.
- 	* @param defaultValue  Valor por defecto a retornar si no se encuentra ningún objeto válido.
- 	* @return Una instancia de {@link Client} construida a partir del JSON o {@code defaultValue} si no se encuentra.
- 	*/
-	public static Client getClient(JsonNode node, String[] attrs, Client defaultValue) {
-		JsonNode targetNode = null;
-
-        for (String attr : attrs) {
-            if (node.has(attr) && node.get(attr).isObject()) {
-                targetNode = node.get(attr);
-                break;
-            }
-        }
-		if(targetNode == null) {
-			return defaultValue;
-		}
-		Client client = new Client();
-        client.setId(JsonUtiles.getLong(targetNode,"client_id,id_client".split(","), 0L));
-        client.setCompanyName(JsonUtiles.getString(targetNode,"name,nombre,company_name,name_company,nombre_compania,compania_nombre".split(","), null));
-        client.setContactName(JsonUtiles.getString(targetNode,"contact_name,contacto,contact,name_contact".split(","), null));
-        client.setExternalCode(JsonUtiles.getString(targetNode,"externalCodeClient,external_code_client,codigo_sap_client".split(","), null));
-		return client;
-	}
-
-	/**
- 	* Construye un objeto {@link Product} a partir de un nodo JSON.
- 	*
- 	* <p>La búsqueda del subobjeto se realiza en el orden de los atributos definidos
- 	* en el arreglo {@code attrs}. El primero encontrado y válido será utilizado
- 	* para construir la instancia.</p>
- 	*
- 	* <p>Si no se encuentra ningún nodo válido, se devuelve el valor por defecto
- 	* especificado en {@code defaultValue}.</p>
- 	*
- 	* @param node          El nodo JSON raíz desde el cual se buscará el subobjeto.
- 	* @param attrs         Lista de nombres de atributos que pueden contener el objeto {@link Product}.
- 	* @param defaultValue  Valor por defecto a retornar si no se encuentra ningún objeto válido.
- 	* @return Una instancia de {@link Product} construida a partir del JSON o {@code defaultValue} si no se encuentra.
- 	*/
-	public static Product getProduct(JsonNode node, String[] attrs, Product defaultValue) {
-		JsonNode targetNode = null;
-
-        for (String attr : attrs) {
-            if (node.has(attr) && node.get(attr).isObject()) {
-                targetNode = node.get(attr);
-                break;
-            }
-        }
-		if(targetNode == null) {
-			return defaultValue;
-		}
-		Product product = new Product();
-		product.setId(JsonUtiles.getLong(targetNode,"product_id,id_product".split(","), 0L));
-		product.setName(JsonUtiles.getString(targetNode,"name,nombre,nombre_producto,product_name".split(","), null));
-		product.setDescription(JsonUtiles.getString(targetNode,"description_product,descripcion_producto,product_description".split(","), null));
-		product.setExternalCode(JsonUtiles.getString(targetNode,"externalCodeProduct,external_code_product,codigo_sap_product".split(","), null));
-		return product;
-	}
-
-	/**
- 	* Construye un objeto {@link Truck} a partir de un nodo JSON.
- 	*
- 	* <p>La búsqueda del subobjeto se realiza en el orden de los atributos definidos
- 	* en el arreglo {@code attrs}. El primero encontrado y válido será utilizado
- 	* para construir la instancia.</p>
- 	*
- 	* <p>Si no se encuentra ningún nodo válido, se devuelve el valor por defecto
- 	* especificado en {@code defaultValue}.</p>
- 	*
- 	* @param node          El nodo JSON raíz desde el cual se buscará el subobjeto.
- 	* @param attrs         Lista de nombres de atributos que pueden contener el objeto {@link Truck}.
- 	* @param defaultValue  Valor por defecto a retornar si no se encuentra ningún objeto válido.
- 	* @return Una instancia de {@link Truck} construida a partir del JSON o {@code defaultValue} si no se encuentra.
- 	*/
-	public static Truck getTruck(JsonNode node, String[] attrs, Truck defaultValue) {
-		JsonNode targetNode = null;
-
-        for (String attr : attrs) {
-            if (node.has(attr) && node.get(attr).isObject()) {
-                targetNode = node.get(attr);
-                break;
-            }
-        }
-		if(targetNode == null) {
-			return defaultValue;
-		}
-		Truck truck = new Truck();
-		truck.setId(JsonUtiles.getLong(targetNode,"truck_id,id_truck".split(","), 0L));
-		truck.setDomain(JsonUtiles.getString(targetNode,"domain,dominio,patente".split(","), null));
-		truck.setDescription(JsonUtiles.getString(targetNode,"description_truck,truck_description,descripcion_camion,camion_descripcion".split(","), null));
-		truck.setCisterns(JsonUtiles.getInt(targetNode,"cisterns,cisterna,cisternas,cistern".split(","), 0));
-		truck.setExternalCode(JsonUtiles.getString(targetNode,"externalCodeTruck,external_code_truck,codigo_sap_truck".split(","), null));
-		return truck;
+		
+		return targetNode;
 	}
 
 	/**
