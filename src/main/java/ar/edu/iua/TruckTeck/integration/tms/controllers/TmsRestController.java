@@ -3,17 +3,17 @@ package ar.edu.iua.TruckTeck.integration.tms.controllers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.HashMap;
-import java.util.Map;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import ar.edu.iua.TruckTeck.controllers.Constants;
 import ar.edu.iua.TruckTeck.integration.tms.model.business.IOrderTmsBusiness;
 import ar.edu.iua.TruckTeck.model.Order;
@@ -138,41 +138,37 @@ public class TmsRestController {
      * @param request Mapa con los parámetros domain (String) y weight (Double o Integer)
      * @return ResponseEntity con la respuesta estructurada y código HTTP correspondiente
      */
-    @PostMapping("/weighing/initial")
-    public ResponseEntity<?> registerInitialWeighing(@RequestBody Map<String, Object> request) {
-        
+    @PostMapping(value = "/weighing/initial", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> registerInitialWeighing(HttpEntity<String> httpEntity) {
         try {
+            // Parsear body JSON de forma explícita para tener control total
+            String body = httpEntity.getBody();
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode node = mapper.readTree(body);
+
             // Extraer y validar parámetros del JSON
-            String domain = (String) request.get("domain");
+            if (node.get("domain") == null || node.get("weight") == null) {
+                return new ResponseEntity<>(
+                        standardResponse.build(HttpStatus.BAD_REQUEST, null, "Faltan campos 'domain' o 'weight'"),
+                        HttpStatus.BAD_REQUEST);
+            }
+
+            String domain = node.get("domain").asText();
             // Soportar weight como Integer o Double para flexibilidad
-            Double weight = request.get("weight") instanceof Integer 
-                ? ((Integer) request.get("weight")).doubleValue() 
-                : (Double) request.get("weight");
-            
+            JsonNode weightNode = node.get("weight");
+            Double weight = weightNode.isNumber() ? weightNode.asDouble() : Double.parseDouble(weightNode.asText());
+
             log.info("TMS API: Recibiendo pesaje inicial para camión: {}, peso: {}", domain, weight);
 
             // Registrar el pesaje inicial en la capa de negocio
             Order order = orderTmsBusiness.registerInitialWeighing(domain, weight);
 
-            log.info("TMS API: Pesaje inicial registrado. Orden: {}, Código: {}", 
-                order.getNumber(), order.getActivationCode());
+            log.info("TMS API: Pesaje inicial registrado. Orden: {}, Código: {}", order.getNumber(), order.getActivationCode());
 
-            // Construir respuesta mínima para el sistema TMS externo
-            // Solo se exponen datos necesarios, sin información sensible
-            Map<String, Object> data = new HashMap<>();
-            data.put("orderNumber", order.getNumber());
-            data.put("activationCode", order.getActivationCode());
-            data.put("truckDomain", order.getTruck().getDomain());
-            data.put("weight", order.getInitialWeight());
-            data.put("timestamp", order.getInitialWeighing());
-            data.put("state", order.getState().name());
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("message", "Pesaje inicial registrado correctamente");
-            response.put("data", data);
-
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            // Respuesta mínima: devolvemos únicamente la ubicación del recurso (orden)
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.set("location", Constants.URL_ORDERS + "/" + order.getId());
+            return new ResponseEntity<>(responseHeaders, HttpStatus.OK);
 
         } catch (NotFoundException e) {
             log.warn("TMS API: {}", e.getMessage());
@@ -186,6 +182,11 @@ public class TmsRestController {
                 standardResponse.build(HttpStatus.BAD_REQUEST, e, e.getMessage()),
                 HttpStatus.BAD_REQUEST
             );
+        } catch (JsonProcessingException e) {
+            log.error("TMS API: JSON inválido en pesaje inicial", e);
+            return new ResponseEntity<>(
+                    standardResponse.build(HttpStatus.BAD_REQUEST, e, "JSON inválido"),
+                    HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             log.error("TMS API: Error interno al registrar pesaje inicial", e);
             return new ResponseEntity<>(
@@ -260,17 +261,26 @@ public class TmsRestController {
      * @param request Mapa con los parámetros activationCode (String) y weight (Double o Integer)
      * @return ResponseEntity con la respuesta estructurada incluyendo datos de conciliación
      */
-    @PostMapping("/weighing/final")
-    public ResponseEntity<?> registerFinalWeighing(@RequestBody Map<String, Object> request) {
-        
+    @PostMapping(value = "/weighing/final", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> registerFinalWeighing(HttpEntity<String> httpEntity) {
         try {
+            // Parsear body JSON de forma explícita para tener control total
+            String body = httpEntity.getBody();
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode node = mapper.readTree(body);
+
             // Extraer y validar parámetros del JSON
-            String activationCode = (String) request.get("activationCode");
+            if (node.get("activationCode") == null || node.get("weight") == null) {
+                return new ResponseEntity<>(
+                        standardResponse.build(HttpStatus.BAD_REQUEST, null, "Faltan campos 'activationCode' o 'weight'"),
+                        HttpStatus.BAD_REQUEST);
+            }
+
+            String activationCode = node.get("activationCode").asText();
             // Soportar weight como Integer o Double para flexibilidad
-            Double weight = request.get("weight") instanceof Integer 
-                ? ((Integer) request.get("weight")).doubleValue() 
-                : (Double) request.get("weight");
-            
+            JsonNode weightNode = node.get("weight");
+            Double weight = weightNode.isNumber() ? weightNode.asDouble() : Double.parseDouble(weightNode.asText());
+
             log.info("TMS API: Recibiendo pesaje final para código: {}, peso: {}", activationCode, weight);
 
             // Registrar el pesaje final en la capa de negocio
@@ -281,25 +291,13 @@ public class TmsRestController {
             Double accumulatedMass = order.getAccumulatedMass() != null ? order.getAccumulatedMass() : 0.0;
             Double balanceDifference = netWeight - accumulatedMass;
 
-            log.info("TMS API: Pesaje final registrado. Orden: {}, Diferencia balanza-caudalímetro: {} kg", 
-                order.getNumber(), balanceDifference);
+            log.info("TMS API: Pesaje final registrado. Orden: {}, Diferencia balanza-caudalímetro: {} kg", order.getNumber(), balanceDifference);
 
-            // Construir respuesta mínima con datos de conciliación
-            Map<String, Object> data = new HashMap<>();
-            data.put("orderNumber", order.getNumber());
-            data.put("truckDomain", order.getTruck().getDomain());
-            data.put("weight", order.getFinalWeight());
-            data.put("timestamp", order.getEndWeighing());
-            data.put("state", order.getState().name());
-            data.put("netWeight", netWeight);                      // Peso neto cargado
-            data.put("balanceDifference", balanceDifference);      // Diferencia balanza vs caudalímetro
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("message", "Pesaje final registrado correctamente");
-            response.put("data", data);
-
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            // Respuesta mínima: devolvemos únicamente la ubicación del recurso actualizado
+            HttpHeaders responseHeaders = new HttpHeaders();
+            // Location hacia la orden actualizada
+            responseHeaders.set("location", Constants.URL_ORDERS + "/" + order.getId());
+            return new ResponseEntity<>(responseHeaders, HttpStatus.OK);
 
         } catch (NotFoundException e) {
             log.warn("TMS API: {}", e.getMessage());
@@ -313,6 +311,11 @@ public class TmsRestController {
                 standardResponse.build(HttpStatus.BAD_REQUEST, e, e.getMessage()),
                 HttpStatus.BAD_REQUEST
             );
+        } catch (JsonProcessingException e) {
+            log.error("TMS API: JSON inválido en pesaje final", e);
+            return new ResponseEntity<>(
+                    standardResponse.build(HttpStatus.BAD_REQUEST, e, "JSON inválido"),
+                    HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             log.error("TMS API: Error interno al registrar pesaje final", e);
             return new ResponseEntity<>(
