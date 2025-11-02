@@ -73,34 +73,34 @@ public class OrderSapJsonDeserializer extends StdDeserializer<Order> {
         driver.setId(JsonUtiles.getLong(nodeAux,"driver_id,id_driver".split(","), 0L));
         driver.setName(JsonUtiles.getString(nodeAux,"name,nombre".split(","), null));
         driver.setSurname(JsonUtiles.getString(nodeAux,"surname,apellido".split(","), null));
-        driver.setDocumentNumber(JsonUtiles.getString(nodeAux,"document_number,dni,documento".split(","), null));
-        driver.setExternalCode(JsonUtiles.getString(nodeAux,"externalCodeDriver,external_code_driver,codigo_sap_driver".split(","), null));
+        driver.setDocumentNumber(JsonUtiles.getString(nodeAux,"document_number,dni,documento,documentNumber".split(","), null));
+        driver.setExternalCode(JsonUtiles.getString(nodeAux,"externalCodeDriver,external_code_driver,codigo_sap_driver,external_code".split(","), null));
 
 
         // Deserializacion de Client
         nodeAux = JsonUtiles.getNode(node, "client,cliente".split(","), null);
         Client client = new Client();
         client.setId(JsonUtiles.getLong(nodeAux,"client_id,id_client".split(","), 0L));
-        client.setCompanyName(JsonUtiles.getString(nodeAux,"name,nombre,company_name,name_company,nombre_compania,compania_nombre".split(","), null));
-        client.setContactName(JsonUtiles.getString(nodeAux,"contact_name,contacto,contact,name_contact".split(","), null));
-        client.setExternalCode(JsonUtiles.getString(nodeAux,"externalCodeClient,external_code_client,codigo_sap_client".split(","), null));
+        client.setCompanyName(JsonUtiles.getString(nodeAux,"name,nombre,company_name,name_company,nombre_compania,compania_nombre,companyName".split(","), null));
+        client.setContactName(JsonUtiles.getString(nodeAux,"contact_name,contacto,contact,name_contact,contactName".split(","), null));
+        client.setExternalCode(JsonUtiles.getString(nodeAux,"externalCodeClient,external_code_client,codigo_sap_client,external_code".split(","), null));
 
         // Deserializacion de Truck
         nodeAux = JsonUtiles.getNode(node, "truck,camion".split(","), null);
         Truck truck = new Truck();
 		truck.setId(JsonUtiles.getLong(nodeAux,"truck_id,id_truck".split(","), 0L));
 		truck.setDomain(JsonUtiles.getString(nodeAux,"domain,dominio,patente".split(","), null));
-		truck.setDescription(JsonUtiles.getString(nodeAux,"description_truck,truck_description,descripcion_camion,camion_descripcion".split(","), null));
+		truck.setDescription(JsonUtiles.getString(nodeAux,"description,description_truck,truck_description,descripcion_camion,camion_descripcion".split(","), null));
 		truck.setCisterns(JsonUtiles.getInt(nodeAux,"cisterns,cisterna,cisternas,cistern".split(","), 0));
-		truck.setExternalCode(JsonUtiles.getString(nodeAux,"externalCodeTruck,external_code_truck,codigo_sap_truck".split(","), null));
+		truck.setExternalCode(JsonUtiles.getString(nodeAux,"externalCodeTruck,external_code_truck,codigo_sap_truck,external_code".split(","), null));
 
         // Deserializacion de Product
         nodeAux = JsonUtiles.getNode(node, "product,producto,order_product,product_order".split(","), null);
         Product product = new Product();
 		product.setId(JsonUtiles.getLong(nodeAux,"product_id,id_product".split(","), 0L));
 		product.setName(JsonUtiles.getString(nodeAux,"name,nombre,nombre_producto,product_name".split(","), null));
-		product.setDescription(JsonUtiles.getString(nodeAux,"description_product,descripcion_producto,product_description".split(","), null));
-		product.setExternalCode(JsonUtiles.getString(nodeAux,"externalCodeProduct,external_code_product,codigo_sap_product".split(","), null));
+		product.setDescription(JsonUtiles.getString(nodeAux,"description_product,descripcion_producto,product_description,description".split(","), null));
+		product.setExternalCode(JsonUtiles.getString(nodeAux,"externalCodeProduct,external_code_product,codigo_sap_product,external_code".split(","), null));
 
 
         LocalDateTime scheduledDate = JsonUtiles.getLocalDateTime(node, "scheduled_date,scheduledDate,date_scheduled,dateScheduled".split(","), LocalDateTime.now());
