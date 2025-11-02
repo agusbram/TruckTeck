@@ -67,22 +67,21 @@ public class OrderTmsBusiness implements IOrderTmsBusiness {
     private OrderStatusLogRepository orderStatusLogRepository;
     
     /**
-     * Registra la tara inicial de una orden basada en el dominio y el peso inicial del camión vacío.
+     * Registra la tara inicial de una orden basada en el número de orden y el peso inicial del camión vacío.
      * 
      * Flujo:
-     * 1. Busca el camión por dominio
-     * 2. Busca una orden en estado PENDING para ese camión
-     * 3. Valida que la orden esté en estado correcto
-     * 4. Genera código de activación de 5 dígitos
-     * 5. Registra el peso inicial y fecha/hora
-     * 6. Cambia estado a TARA_REGISTERED
-     * 7. Registra el cambio de estado en el log
+     * 1. Busca la orden por número de orden
+     * 2. Valida que la orden esté en estado PENDING
+     * 3. Genera código de activación de 5 dígitos
+     * 4. Registra el peso inicial y fecha/hora
+     * 5. Cambia estado a TARA_REGISTERED
+     * 6. Registra el cambio de estado en el log
      * 
-     * @param number dominio del camión (ej: "ABC123")
+     * @param number número de orden (ej: "ORD-001")
      * @param initialWeight peso del camión vacío (tara) en kg
      * @return Order actualizada con el pesaje inicial registrado
-     * @throws BusinessException si ocurre un error en la lógica de negocio
-     * @throws NotFoundException si no se encuentra el camión o la orden
+     * @throws BusinessException si ocurre un error en la lógica de negocio o la orden no está en estado PENDING
+     * @throws NotFoundException si no se encuentra la orden con el número especificado
      * @throws FoundException si ya existe un código de activación duplicado (muy improbable)
      */
     @Override
@@ -97,7 +96,7 @@ public class OrderTmsBusiness implements IOrderTmsBusiness {
             Optional<Order> orderOpt = orderRepository.findByNumber(number);
             if (orderOpt.isEmpty()) {
                 throw new NotFoundException(
-                    "No se encontró una orden pendiente de pesaje inicial para el camión: " + number
+                    "No se encontró una orden pendiente de pesaje inicial con el numero: " + number
                 );
             }
             // 2. Obtener la orden
@@ -112,17 +111,6 @@ public class OrderTmsBusiness implements IOrderTmsBusiness {
             
             // 4. Generar código de activación único de 5 dígitos
             String activationCode = generateActivationCode();
-            
-            // // Verificar que no exista (muy improbable, pero por seguridad)
-            // int attempts = 0;
-            // while (orderRepository.findByActivationCode(activationCode).isPresent() && attempts < 10) {
-            //     activationCode = generateActivationCode();
-            //     attempts++;
-            // }
-            
-            // if (attempts >= 10) {
-            //     throw new BusinessException("No se pudo generar un código de activación único");
-            // }
             
             // 5. Registrar datos del pesaje inicial
             order.setInitialWeight(initialWeight);
@@ -155,35 +143,39 @@ public class OrderTmsBusiness implements IOrderTmsBusiness {
     }
 
     /**
-     * Registra el peso final de una orden basada en el código de activación y el peso final del camión cargado.
+     * Registra el peso final de una orden basada en el número de orden y el peso final del camión cargado.
      * 
      * Flujo:
-     * 1. Busca la orden por código de activación
+     * 1. Busca la orden por número de orden
      * 2. Valida que esté en estado LOADING (cerrada para carga)
-     * 3. Registra el peso final y fecha/hora
-     * 4. Cambia estado a FINALIZED
-     * 5. Registra el cambio de estado en el log
-     * 6. Calcula y retorna la conciliación
+     * 3. Valida que tenga pesaje inicial registrado
+     * 4. Registra el peso final y fecha/hora
+     * 5. Cambia estado a FINALIZED
+     * 6. Registra el cambio de estado en el log
+     * 7. Retorna la orden con los datos de conciliación
      * 
-     * @param activationCode código de activación de 5 dígitos generado en el pesaje inicial
+     * @param number número de orden (ej: "ORD-001")
      * @param finalWeight peso del camión cargado en kg
      * @return Order actualizada con el pesaje final y datos de conciliación
-     * @throws BusinessException si ocurre un error en la lógica de negocio
-     * @throws NotFoundException si no se encuentra la orden
+     * @throws BusinessException si ocurre un error en la lógica de negocio o la orden no está en estado LOADING
+     * @throws NotFoundException si no se encuentra la orden con el número especificado
      * @throws FoundException (no se usa en este método, pero está en la firma de la interfaz)
      */
     @Override
-    public Order registerFinalWeighing(String activationCode, Double finalWeight) 
+    public Order registerFinalWeighing(String number, Double finalWeight) 
             throws BusinessException, NotFoundException, FoundException {
         
-        log.info("TMS: Registrando pesaje final para código de activación: {}", activationCode);
+        log.info("TMS: Registrando pesaje final para código de activación: {}", number);
         
         try {
-            // 1. Buscar la orden por código de activación
-            Optional<Order> orderOpt = orderRepository.findByActivationCode(activationCode);
+            // // 1. Buscar la orden por código de activación
+            // Optional<Order> orderOpt = orderRepository.findByActivationCode(activationCode);
+            
+            // 1. Buscar la orden por número de orden
+            Optional<Order> orderOpt = orderRepository.findByNumber(number);
             if (orderOpt.isEmpty()) {
                 throw new NotFoundException(
-                    "No se encontró una orden con el código de activación: " + activationCode
+                    "No se encontró una orden con el numero de orden: " + number
                 );
             }
             Order order = orderOpt.get();
@@ -196,7 +188,7 @@ public class OrderTmsBusiness implements IOrderTmsBusiness {
                 );
             }
             
-            // 3. Validar que tenga pesaje inicial
+            // 3. Validar que tenga pesaje inicial (por las dudas)
             if (order.getInitialWeight() == null) {
                 throw new BusinessException(
                     "La orden " + order.getNumber() + " no tiene pesaje inicial registrado"

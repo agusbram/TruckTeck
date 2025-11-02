@@ -24,6 +24,9 @@ import ar.edu.iua.TruckTeck.util.IStandardResponseBusiness;
 @RequestMapping(value = Constants.URL_TMS, produces = MediaType.APPLICATION_JSON_VALUE)
 public class TmsRestController {
 
+    /**
+     * Logger para la clase {@link TmsRestController}.
+     */
     private static final Logger log = LoggerFactory.getLogger(TmsRestController.class);
 
     /**
@@ -39,14 +42,21 @@ public class TmsRestController {
     private IStandardResponseBusiness standardResponse;
 
     /**
-     * Registra el pesaje inicial de un camión vacío.
+     * Registra el pesaje inicial de una orden basada en el número de orden y el peso proporcionado.
      * <p>
-     * <b>Endpoint:</b> {@code POST /api/v1/tms/weighing/initial}
+     * <b>Endpoint:</b> {@code POST /api/v1/tms/b2b/weighing/initial}
+     * </p>
+     * <p>
+     * Recibe el body como JSON con los campos {@code number} (número de orden) y {@code initialWeight} (peso inicial en kg).
+     * Busca la orden por número, valida que esté en estado PENDING, registra el peso inicial, genera un código de activación
+     * y cambia el estado a TARA_REGISTERED.
      * </p>
      * 
-     * @param number El dominio (patente) del camión.
-     * @param weight El peso inicial (tara) del camión.
-     * @return Una respuesta HTTP con el estado de la operación.
+     * @param orderBody Objeto {@link Order} con los datos del pesaje inicial (number y initialWeight).
+     * @return {@link ResponseEntity} con:
+     *         - {@link HttpStatus#OK} si el pesaje se registró correctamente (incluye header "location"),
+     *         - {@link HttpStatus#NOT_FOUND} si no se encuentra la orden,
+     *         - {@link HttpStatus#INTERNAL_SERVER_ERROR} si ocurre un error de negocio.
      */
     @PostMapping(value = "b2b/weighing/initial")
     //public ResponseEntity<?> registerInitialWeighing(@PathVariable String number, @PathVariable Double weight) {
@@ -88,55 +98,59 @@ public class TmsRestController {
     }
 
     /**
-     * Registra el pesaje final de un camión cargado.
+     * Registra el pesaje final de una orden basada en el número de orden y el peso final proporcionado.
      * <p>
-     * <b>Endpoint:</b> {@code POST /api/v1/tms/weighing/final}
+     * <b>Endpoint:</b> {@code POST /api/v1/tms/b2b/weighing/final}
+     * </p>
+     * <p>
+     * Recibe el body como JSON con los campos {@code number} (número de orden) y {@code finalWeight} (peso final en kg).
+     * Busca la orden por número, valida que esté en estado LOADING, registra el peso final
+     * y cambia el estado a FINALIZED.
      * </p>
      * 
-     * @param activationCode El código de activación de 5 dígitos.
-     * @param weight El peso final del camión cargado.
-     * @return Una respuesta HTTP con el estado de la operación.
+     * @param orderBody Objeto {@link Order} con los datos del pesaje final (number y finalWeight).
+     * @return {@link ResponseEntity} con:
+     *         - {@link HttpStatus#OK} si el pesaje se registró correctamente (incluye header "location"),
+     *         - {@link HttpStatus#NOT_FOUND} si no se encuentra la orden,
+     *         - {@link HttpStatus#BAD_REQUEST} si la orden no está en estado correcto.
      */
-//     @PostMapping(value = "/weighing/final")
-//     public ResponseEntity<?> registerFinalWeighing(@RequestParam String activationCode, @RequestParam Double weight) {
-//         try {
-//             // log.info("TMS API: Recibiendo pesaje final para código: {}, peso: {}", activationCode, weight);
+    @PostMapping(value = "b2b/weighing/final")
+    public ResponseEntity<?> registerFinalWeighing(@RequestBody Order orderBody) {
+        String number = orderBody.getNumber();
+        Double finalWeight = orderBody.getFinalWeight();
 
-//             // Registrar el pesaje final en la capa de negocio
-//             Order order = orderTmsBusiness.registerFinalWeighing(activationCode, weight);
 
-//             // Calcular datos de conciliación
-//             if (order.getInitialWeight() != null && order.getFinalWeight() != null) {
-//                 Double netWeight = order.getFinalWeight() - order.getInitialWeight();
-//                 Double accumulatedMass = order.getAccumulatedMass() != null ? order.getAccumulatedMass() : 0.0;
-//                 Double balanceDifference = netWeight - accumulatedMass;
+        try {
+            log.info("TMS API: Recibiendo pesaje final para código: {}, peso: {}", number, finalWeight);
 
-//                 // log.info("TMS API: Pesaje final registrado. Orden ID: {}, Diferencia balanza-caudalímetro: {} kg", order.getId(), balanceDifference);
-//             }
+            // Registrar el pesaje final en la capa de negocio
+            Order order = orderTmsBusiness.registerFinalWeighing(number, finalWeight);
 
-//             // Devolvemos la orden completa en la respuesta
-//             HttpHeaders responseHeaders = new HttpHeaders();
-//             responseHeaders.set("location", Constants.URL_ORDERS + "/" + order.getId());
-//             return new ResponseEntity<>(order, responseHeaders, HttpStatus.OK);
+            log.info("TMS API: Pesaje final registrado. Orden ID: {}, Peso: {}", order.getId(), finalWeight);
 
-//         } catch (NotFoundException e) {
-//             // log.warn("TMS API: {}", e.getMessage());
-//             return new ResponseEntity<>(
-//                 standardResponse.build(HttpStatus.NOT_FOUND, e, e.getMessage()),
-//                 HttpStatus.NOT_FOUND
-//             );
-//         } catch (BusinessException e) {
-//             // log.error("TMS API: Error de negocio: {}", e.getMessage());
-//             return new ResponseEntity<>(
-//                 standardResponse.build(HttpStatus.BAD_REQUEST, e, e.getMessage()),
-//                 HttpStatus.BAD_REQUEST
-//             );
-//         } catch (Exception e) {
-//             // log.error("TMS API: Error interno al registrar pesaje final", e);
-//             return new ResponseEntity<>(
-//                 standardResponse.build(HttpStatus.INTERNAL_SERVER_ERROR, e, "Error interno del servidor"),
-//                 HttpStatus.INTERNAL_SERVER_ERROR
-//             );
-//         }
-//     }
+            // Respuesta mínima: devolvemos únicamente la ubicación del recurso (orden)
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.set("location", Constants.URL_ORDERS + "/" + order.getId());
+            return new ResponseEntity<>(responseHeaders, HttpStatus.OK);
+
+        } catch (NotFoundException e) {
+            log.warn("TMS API: {}", e.getMessage());
+            return new ResponseEntity<>(
+                standardResponse.build(HttpStatus.NOT_FOUND, e, e.getMessage()),
+                HttpStatus.NOT_FOUND
+            );
+        } catch (BusinessException e) {
+            log.error("TMS API: Error de negocio: {}", e.getMessage());
+            return new ResponseEntity<>(
+                standardResponse.build(HttpStatus.BAD_REQUEST, e, e.getMessage()),
+                HttpStatus.BAD_REQUEST
+            );
+        } catch (Exception e) {
+            log.error("TMS API: Error interno al registrar pesaje final", e);
+            return new ResponseEntity<>(
+                standardResponse.build(HttpStatus.INTERNAL_SERVER_ERROR, e, "Error interno del servidor"),
+                HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
 }
