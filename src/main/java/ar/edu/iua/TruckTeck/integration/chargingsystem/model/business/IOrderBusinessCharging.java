@@ -15,7 +15,7 @@ public interface IOrderBusinessCharging {
      * @throws BusinessException Si ocurre un error inesperado en la capa de negocio.
      * @throws EmptyFieldException Si el nombre del producto viene vacío o es nulo, entonces se lanza esta excepcion
      */
-    public Order addExternalCharging(String json) throws BusinessException, EmptyFieldException;
+    public Order addExternalCharging(String json) throws BusinessException, EmptyFieldException, NotFoundException;
 
     public Double getPreset(String number, String activationCode) throws BusinessException, NotFoundException;
 
