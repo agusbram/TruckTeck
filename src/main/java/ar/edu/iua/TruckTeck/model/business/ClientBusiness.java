@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * Implementación de la interfaz {@link IClientBusiness} que gestiona la lógica 
- * de negocio para los productos.
+ * de negocio para los clientes.
  * <p>
  * Esta clase utiliza {@link ClientRepository} para acceder a los datos persistentes 
  * y aplica la lógica de negocio correspondiente. Los métodos lanzan excepciones

@@ -19,7 +19,7 @@ import ar.edu.iua.TruckTeck.model.enums.OrderState;
  * 
  * <p><b>Consultas personalizadas:</b></p>
  * <ul>
- *   <li>{@link #findByNumber(long)} - Buscar orden por número</li>
+ *   <li>{@link #findByNumber(String)} - Buscar orden por número de orden</li>
  *   <li>{@link #findByTruckDomainAndState(String, OrderState)} - Buscar orden por dominio de camión y estado (TMS)</li>
  *   <li>{@link #findByActivationCode(String)} - Buscar orden por código de activación (TMS)</li>
  * </ul>

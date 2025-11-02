@@ -13,17 +13,19 @@ import ar.edu.iua.TruckTeck.model.Truck;
 import ar.edu.iua.TruckTeck.model.business.exceptions.BusinessException;
 import ar.edu.iua.TruckTeck.model.business.exceptions.FoundException;
 import ar.edu.iua.TruckTeck.model.business.exceptions.NotFoundException;
-import ar.edu.iua.TruckTeck.model.persistence.ClientRepository;
+// import ar.edu.iua.TruckTeck.model.persistence.ClientRepository;
 import ar.edu.iua.TruckTeck.model.persistence.OrderRepository;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Implementación de la interfaz {@link IClientBusiness} que gestiona la lógica 
- * de negocio para los productos.
+ * Implementación de la interfaz {@link IOrderBusiness} que gestiona la lógica 
+ * de negocio para las órdenes.
  * <p>
- * Esta clase utiliza {@link ClientRepository} para acceder a los datos persistentes 
+ * Esta clase utiliza {@link OrderRepository} para acceder a los datos persistentes 
  * y aplica la lógica de negocio correspondiente. Los métodos lanzan excepciones
  * específicas para manejar errores de negocio, recursos no encontrados o duplicados.
+ * Coordina con otros servicios de negocio (Client, Driver, Truck, Product) para
+ * validar y gestionar las relaciones de la orden.
  * </p>
  *
  * <p>

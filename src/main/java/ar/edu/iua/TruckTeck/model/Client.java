@@ -11,6 +11,23 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Entidad que representa un cliente del sistema.
+ * <p>
+ * Los clientes son las empresas o personas que solicitan órdenes de carga
+ * de productos. Cada orden debe estar asociada a un cliente específico.
+ * </p>
+ * 
+ * <h3>Integración con SAP:</h3>
+ * <p>
+ * El campo {@code externalCode} almacena el código del cliente en el sistema SAP,
+ * permitiendo sincronización y referencia cruzada con el ERP externo.
+ * Este campo es opcional ({@code nullable = true}) para clientes creados
+ * directamente en el sistema TMS sin origen en SAP.
+ * </p>
+ * 
+ * @see Order
+ */
 @Getter
 @Setter
 @NoArgsConstructor

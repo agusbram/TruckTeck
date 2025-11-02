@@ -39,7 +39,7 @@ public class DriverRestController {
     private IStandardResponseBusiness response;
 
     /**
-     * Componente de negocio encargado de la lógica de productos.
+     * Componente de negocio encargado de la lógica de conductores/choferes.
      */
     @Autowired
     private IDriverBusiness driverBusiness;

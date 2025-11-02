@@ -18,6 +18,43 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Entidad que representa una orden de carga de producto en el sistema TMS (Terminal Management System).
+ * <p>
+ * Esta entidad gestiona el ciclo de vida completo de una orden, desde su creación hasta su finalización,
+ * pasando por los procesos de pesaje (tara y bruto) y carga del producto en el camión.
+ * </p>
+ * 
+ * <h3>Ciclo de vida de la orden:</h3>
+ * <ol>
+ *   <li><b>PENDING:</b> Orden creada, esperando el registro del peso inicial (tara) del camión.</li>
+ *   <li><b>TARA_REGISTERED:</b> Peso inicial registrado, camión listo para cargar producto.</li>
+ *   <li><b>LOADING:</b> Carga en progreso, recibiendo datos de carga en tiempo real.</li>
+ *   <li><b>FINALIZED:</b> Carga completada, peso final registrado y orden cerrada.</li>
+ * </ol>
+ * 
+ * <h3>Integraciones externas:</h3>
+ * <ul>
+ *   <li><b>SAP:</b> Las órdenes pueden crearse desde el sistema SAP, identificadas por {@code externalCode}.</li>
+ *   <li><b>TMS (Balanza):</b> Sistema de pesaje que registra pesos iniciales y finales vía endpoints REST.</li>
+ *   <li><b>Sistema de Carga:</b> Envía datos de carga en tiempo real (masa, densidad, temperatura, caudal)
+ *       almacenados en {@link OrderDetail}.</li>
+ * </ul>
+ * 
+ * <h3>Relaciones:</h3>
+ * <ul>
+ *   <li>{@link Driver}: Chofer asignado a la orden.</li>
+ *   <li>{@link Client}: Cliente que solicita el producto.</li>
+ *   <li>{@link Truck}: Camión que transportará el producto.</li>
+ *   <li>{@link Product}: Producto a cargar.</li>
+ *   <li>{@link OrderDetail}: Detalles de la carga en tiempo real (relación uno-a-muchos).</li>
+ *   <li>{@link OrderStatusLog}: Registro de auditoría de cambios de estado (relación uno-a-muchos).</li>
+ * </ul>
+ * 
+ * @see OrderState
+ * @see OrderDetail
+ * @see OrderStatusLog
+ */
 @Getter
 @Setter
 @AllArgsConstructor

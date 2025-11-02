@@ -14,10 +14,10 @@ import ar.edu.iua.TruckTeck.model.persistence.DriverRepository;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Implementación de la interfaz {@link IProductBusiness} que gestiona la lógica 
- * de negocio para los productos.
+ * Implementación de la interfaz {@link IDriverBusiness} que gestiona la lógica 
+ * de negocio para los choferes.
  * <p>
- * Esta clase utiliza {@link ProductRepository} para acceder a los datos persistentes 
+ * Esta clase utiliza {@link DriverRepository} para acceder a los datos persistentes 
  * y aplica la lógica de negocio correspondiente. Los métodos lanzan excepciones
  * específicas para manejar errores de negocio, recursos no encontrados o duplicados.
  * </p>

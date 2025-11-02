@@ -20,21 +20,23 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class OrderBusinessSap extends OrderBusiness implements IOrderBusinessSap {
     /**
-     * Agrega un nuevo producto a CLI1 a partir de una representación en formato JSON.
+     * Agrega una nueva orden a partir de una representación en formato JSON proveniente del sistema SAP.
      * <p>
      * Utiliza un {@link ObjectMapper} configurado con un deserializador
-     * personalizado {@link ProductCli1JsonDeserializer} para convertir
-     * la cadena JSON en un objeto {@link ProductCli1}.
+     * personalizado {@link OrderSapJsonDeserializer} para convertir
+     * la cadena JSON en un objeto {@link Order}.
      * </p>
      * <p>
-     * Una vez creado el objeto, reutiliza la lógica de {@link #add(ProductCli1)}
-     * para validar duplicados y registrar el producto.
+     * Valida que los campos obligatorios estén presentes (número de orden, conductor, cliente, camión, producto y preset).
+     * Si algún campo falta o está vacío, lanza {@link EmptyFieldException}.
+     * Una vez validado, reutiliza la lógica de {@link #add(Order)} para registrar la orden.
      * </p>
      *
-     * @param json Cadena en formato JSON que representa al producto a registrar.
-     * @return El producto agregado y persistido en la base de datos.
-     * @throws FoundException    Si el producto ya existe en el sistema base o en CLI1.
+     * @param json Cadena en formato JSON que representa la orden a registrar.
+     * @return La orden agregada y persistida en la base de datos.
+     * @throws FoundException    Si la orden ya existe en el sistema.
      * @throws BusinessException Si ocurre un error inesperado durante la deserialización o el guardado.
+     * @throws EmptyFieldException Si falta algún campo obligatorio (número, conductor, cliente, camión, producto, preset).
      */
 	@Override
 	public Order addExternalSap(String json) throws FoundException, BusinessException, EmptyFieldException {
@@ -100,5 +102,4 @@ public class OrderBusinessSap extends OrderBusiness implements IOrderBusinessSap
 		return add(order);
 
 	}
-    
 }

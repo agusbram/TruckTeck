@@ -11,6 +11,23 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Entidad que representa un chofer/conductor del sistema.
+ * <p>
+ * Los choferes son los responsables de conducir los camiones y realizar
+ * las operaciones de carga. Cada orden debe estar asociada a un chofer específico.
+ * </p>
+ * 
+ * <h3>Integración con SAP:</h3>
+ * <p>
+ * El campo {@code externalCode} almacena el código del chofer en el sistema SAP,
+ * permitiendo sincronización y referencia cruzada con el ERP externo.
+ * Este campo es opcional ({@code nullable = true}) para choferes creados
+ * directamente en el sistema TMS sin origen en SAP.
+ * </p>
+ * 
+ * @see Order
+ */
 @Getter
 @Setter
 @NoArgsConstructor

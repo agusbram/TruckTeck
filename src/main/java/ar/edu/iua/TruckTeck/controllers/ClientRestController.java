@@ -25,7 +25,7 @@ import ar.edu.iua.TruckTeck.util.IStandardResponseBusiness;
  * Controlador REST para la gestión de clientes.
  * <p>
  * Proporciona endpoints para listar y agregar clientes mediante solicitudes HTTP.
- * Utiliza las rutas definidas en {@link Constants#URL_clientS}.
+ * Utiliza las rutas definidas en {@link Constants#URL_CLIENTS}.
  * </p>
  */
 @RestController
@@ -39,7 +39,7 @@ public class ClientRestController {
     private IStandardResponseBusiness response;
 
     /**
-     * Componente de negocio encargado de la lógica de productos.
+     * Componente de negocio encargado de la lógica de clientes.
      */
     @Autowired
     private IClientBusiness clientBusiness;
@@ -67,7 +67,7 @@ public class ClientRestController {
     /**
      * Endpoint para agregar un nuevo cliente.
      * <p>
-     * Responde a solicitudes HTTP POST con un objeto {@link client} en el cuerpo de la solicitud.
+     * Responde a solicitudes HTTP POST con un objeto {@link Client} en el cuerpo de la solicitud.
      * Devuelve la ubicación del nuevo recurso en el encabezado HTTP 'Location'.
      * </p>
      *
@@ -112,9 +112,9 @@ public class ClientRestController {
     }
     
      /**
-     * Obtiene un cliente por su numero de documento.
+     * Obtiene un cliente por su nombre de compañía.
      *
-     * @param companyName nombre del cliente a buscar.
+     * @param companyName Nombre de la compañía del cliente a buscar.
      * @return Un {@link ResponseEntity} que contiene el cliente encontrado (HTTP 200 OK),
      *         o un mensaje de error si ocurre una excepción de negocio (HTTP 500)
      *         o si no se encuentra el cliente (HTTP 404).

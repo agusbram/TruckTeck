@@ -38,7 +38,7 @@ public class OrderRestController {
     private IStandardResponseBusiness response;
 
     /**
-     * Componente de negocio encargado de la lógica de productos.
+     * Componente de negocio encargado de la lógica de órdenes.
      */
     @Autowired
     private IOrderBusiness orderBusiness;

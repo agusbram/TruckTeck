@@ -68,16 +68,16 @@ public class TruckRestController {
     }
 
     /**
-     * Endpoint para agregar un nuevo camion.
+     * Endpoint para agregar un nuevo camión.
      * <p>
-     * Responde a solicitudes HTTP POST con un objeto {@link truck} en el cuerpo de la solicitud.
+     * Responde a solicitudes HTTP POST con un objeto {@link Truck} en el cuerpo de la solicitud.
      * Devuelve la ubicación del nuevo recurso en el encabezado HTTP 'Location'.
      * </p>
      *
-     * @param truck El camion a agregar.
+     * @param truck El camión a agregar.
      * @return ResponseEntity que indica el resultado de la operación.
-     *         - {@link HttpStatus#CREATED} si el camion se creó correctamente.
-     *         - {@link HttpStatus#FOUND} si ya existe un camion similar ({@link FoundException}).
+     *         - {@link HttpStatus#CREATED} si el camión se creó correctamente.
+     *         - {@link HttpStatus#FOUND} si ya existe un camión similar ({@link FoundException}).
      *         - {@link HttpStatus#INTERNAL_SERVER_ERROR} si ocurre un {@link BusinessException}.
      */
     @PostMapping(value = "")
@@ -96,12 +96,12 @@ public class TruckRestController {
     }
 
     /**
-     * Obtiene un camion por su identificador único.
+     * Obtiene un camión por su identificador único.
      *
-     * @param id Identificador numérico del camion a buscar.
-     * @return Un {@link ResponseEntity} que contiene el camion encontrado (HTTP 200 OK),
+     * @param id Identificador numérico del camión a buscar.
+     * @return Un {@link ResponseEntity} que contiene el camión encontrado (HTTP 200 OK),
      *         o un mensaje de error si ocurre una excepción de negocio (HTTP 500)
-     *         o si no se encuentra el camion (HTTP 404).
+     *         o si no se encuentra el camión (HTTP 404).
      */
     @GetMapping(value = "/{id}")
     public ResponseEntity<?> load(@PathVariable long id) {
@@ -115,12 +115,12 @@ public class TruckRestController {
     }
     
      /**
-     * Obtiene un camion por su nombre.
+     * Obtiene un camión por su dominio (patente).
      *
-     * @param truck Nombre del camion a buscar.
-     * @return Un {@link ResponseEntity} que contiene el camion encontrado (HTTP 200 OK),
+     * @param truck Dominio (patente) del camión a buscar (ej: "ABC123").
+     * @return Un {@link ResponseEntity} que contiene el camión encontrado (HTTP 200 OK),
      *         o un mensaje de error si ocurre una excepción de negocio (HTTP 500)
-     *         o si no se encuentra el camion (HTTP 404).
+     *         o si no se encuentra el camión (HTTP 404).
      */
     @GetMapping(value = "/by-name/{truck}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> load(@PathVariable String truck) {
@@ -134,13 +134,13 @@ public class TruckRestController {
     }
 
     /**
-     * Actualiza un camion existente con los datos proporcionados.
+     * Actualiza un camión existente con los datos proporcionados.
      *
-     * @param truck Objeto {@link truck} con los datos actualizados del camion.
+     * @param truck Objeto {@link Truck} con los datos actualizados del camión.
      * @return Un {@link ResponseEntity} con estado HTTP 200 si la actualización es exitosa,
      *         o un mensaje de error si ocurre una excepción de negocio (HTTP 500)
-     *         o si el camion no existe (HTTP 404)
-     *         o si el camion existe (HTTP 302).
+     *         o si el camión no existe (HTTP 404)
+     *         o si el camión existe (HTTP 302).
      */
     @PutMapping(value = "")
     public ResponseEntity<?> update(@RequestBody Truck truck) {
