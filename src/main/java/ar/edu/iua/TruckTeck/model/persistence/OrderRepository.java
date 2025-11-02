@@ -62,10 +62,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
      * <p><b>Formato del código:</b> 5 dígitos numéricos (ej: "48765", "00123")</p>
      * 
      * @param activationCode Código de activación único generado en el pesaje inicial
+     * @param number numero de orden.
      * @return Optional con la orden encontrada, o empty si el código no es válido
      */
-    @Query("SELECT o FROM Order o WHERE o.activationCode = :activationCode")
-    Optional<Order> findByActivationCode(@Param("activationCode") String activationCode);
+    @Query("SELECT o FROM Order o WHERE o.activationCode = :activationCode AND o.number = :number")
+    Optional<Order> findByActivationCode(@Param("activationCode") String activationCode,@Param("number") String number);
 
     /**
      * Busca una orden por su número de orden.
