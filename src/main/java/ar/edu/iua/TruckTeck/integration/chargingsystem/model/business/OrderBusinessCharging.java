@@ -1,5 +1,6 @@
 package ar.edu.iua.TruckTeck.integration.chargingsystem.model.business;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -13,14 +14,16 @@ import ar.edu.iua.TruckTeck.integration.sap.model.OrderSapJsonDeserializer;
 import ar.edu.iua.TruckTeck.model.Order;
 import ar.edu.iua.TruckTeck.model.OrderDetail;
 import ar.edu.iua.TruckTeck.model.business.IOrderBusiness;
-import ar.edu.iua.TruckTeck.model.business.ITruckBusiness;
 import ar.edu.iua.TruckTeck.model.business.OrderBusiness;
 import ar.edu.iua.TruckTeck.model.business.exceptions.BusinessException;
 import ar.edu.iua.TruckTeck.model.business.exceptions.EmptyFieldException;
 import ar.edu.iua.TruckTeck.model.business.exceptions.NotFoundException;
+import ar.edu.iua.TruckTeck.model.enums.OrderState;
+import ar.edu.iua.TruckTeck.model.persistence.OrderDetailRepository;
 import ar.edu.iua.TruckTeck.model.persistence.OrderRepository;
 import ar.edu.iua.TruckTeck.util.JsonUtiles;
 import lombok.extern.slf4j.Slf4j;
+import ar.edu.iua.TruckTeck.controllers.Constants;
 
 @Service
 @Slf4j
@@ -34,6 +37,9 @@ public class OrderBusinessCharging extends OrderBusiness implements IOrderBusine
      */
     @Autowired
     private OrderRepository orderDAO;
+
+    @Autowired
+    private OrderDetailRepository orderDetailDAO;
 
     @Autowired
     private IOrderBusiness orderBusiness;
@@ -77,6 +83,11 @@ public class OrderBusinessCharging extends OrderBusiness implements IOrderBusine
                    .build();
             }
 
+            if(charge.getCaudal()<=0){
+                throw BusinessException.builder().message("El caudal debe ser mayor a 0:" + charge.getCaudal())
+                   .build();
+            }
+
             order = orderBusiness.load(order_number);
             
             OrderDetail detail = new OrderDetail();
@@ -87,8 +98,36 @@ public class OrderBusinessCharging extends OrderBusiness implements IOrderBusine
             detail.setTimestamp(LocalDateTime.now());
             detail.setOrder(charge);
 
+            if (order.getDensity() == null &&
+                order.getAccumulatedMass() == null &&
+                order.getTemperature() == null &&
+                order.getCaudal() == null &&
+                order.getState() == OrderState.TARA_REGISTERED){
 
+                order.setAccumulatedMass(charge.getAccumulatedMass());
+                order.setDensity(charge.getDensity());
+                order.setTemperature(charge.getTemperature());
+                order.setCaudal(charge.getCaudal());
 
+                order.setStartLoading(LocalDateTime.now());
+                order.setEndLoading(LocalDateTime.now());
+                order.setState(OrderState.LOADING);
+
+                orderDetailDAO.save(detail);
+                return orderDAO.save(order);
+            }
+            if(order.getAccumulatedMass()<detail.getAccumulatedMass() || order.getCaudal()<= 0){
+                throw BusinessException.builder().message("La masa acumulada contiene informacion erronea" + detail.getAccumulatedMass())
+                   .build();
+            }
+            
+            // Ya pasaron 10 segundos desde endLoading
+            if (Duration.between(order.getEndLoading(), LocalDateTime.now()).getSeconds() >= Constants.FREQUENCY) {
+                orderDetailDAO.save(detail);
+            }
+
+            order.setEndLoading(LocalDateTime.now());
+            return orderDAO.save(order);
 
 		} catch (JsonProcessingException e) {
 			log.error(e.getMessage(), e);
@@ -97,7 +136,6 @@ public class OrderBusinessCharging extends OrderBusiness implements IOrderBusine
 
         // Aqui se guarda en la base de datos el producto deserializado
 		return order;
-
 
     }
 
