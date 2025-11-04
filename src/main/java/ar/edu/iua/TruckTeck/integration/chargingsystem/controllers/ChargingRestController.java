@@ -78,7 +78,20 @@ public class ChargingRestController {
 			 */
 			return new ResponseEntity<>(response.build(HttpStatus.BAD_REQUEST, e, e.getMessage()), HttpStatus.BAD_REQUEST);
         }
-	}
+    }
 
-
+    @PostMapping(value = "loaded/b2b/{number}")
+	public ResponseEntity<?> loaded(@PathVariable String number) {
+		try {
+			Order response = orderBusiness.changeStateLoaded(number);
+			HttpHeaders responseHeaders = new HttpHeaders();
+			responseHeaders.set("location", Constants.URL_ORDERS_CHARGING + "/" + response.getId());
+			return new ResponseEntity<>(responseHeaders, HttpStatus.CREATED);
+		} catch (BusinessException e) {
+			return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (NotFoundException e) {
+			return new ResponseEntity<>(response.build(HttpStatus.FOUND, e, e.getMessage()), HttpStatus.FOUND);
+		}
+        }
 }

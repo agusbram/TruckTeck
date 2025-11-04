@@ -24,22 +24,22 @@ public class OrderChargingJsonDeserializar extends StdDeserializer<Order>{
 		super(vc);
 	}
 
-    public Order deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JacksonException {
-        Order order = new Order();
-        JsonNode node = jp.getCodec().readTree(jp);
+        public Order deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JacksonException {
+            Order order = new Order();
+            JsonNode node = jp.getCodec().readTree(jp);
 
-        String number = JsonUtiles.getString(node, "number,numero".split(","), null);
-        Double accumulatedMass = JsonUtiles.getDouble(node, "accumulatedMass,accumulated_mass,masa,masa_acumulada".split(","), -1);
-        Double density = JsonUtiles.getDouble(node, "density,densidad".split(","), -1);
-        Double temperature = JsonUtiles.getDouble(node, "temperature,temperatura".split(","), -1);
-        Double caudal = JsonUtiles.getDouble(node,"caudal,caudales".split(","), -1);
+            String number = JsonUtiles.getString(node, "number,numero".split(","), null);
+            Double accumulatedMass = JsonUtiles.getDouble(node, "accumulatedMass,accumulated_mass,masa,masa_acumulada".split(","), -1);
+            Double density = JsonUtiles.getDouble(node, "density,densidad".split(","), -1);
+            Double temperature = JsonUtiles.getDouble(node, "temperature,temperatura".split(","), -1);
+            Double caudal = JsonUtiles.getDouble(node,"caudal,caudales".split(","), -1);
 
-        order.setCaudal(caudal);
-        order.setTemperature(temperature);
-        order.setDensity(density);
-        order.setAccumulatedMass(accumulatedMass);
-        order.setNumber(number);
-        return order;
-    }
+            order.setCaudal(caudal);
+            order.setTemperature(temperature);
+            order.setDensity(density);
+            order.setAccumulatedMass(accumulatedMass);
+            order.setNumber(number);
+            return order;
+        }
 }
 

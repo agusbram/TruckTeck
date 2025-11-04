@@ -19,4 +19,6 @@ public interface IOrderBusinessCharging {
 
     public Double getPreset(String number, String activationCode) throws BusinessException, NotFoundException;
 
+    public Order changeStateLoaded(String number) throws BusinessException, NotFoundException;
+
 }

@@ -83,12 +83,17 @@ public class OrderBusinessCharging extends OrderBusiness implements IOrderBusine
                    .build();
             }
 
+            order = orderBusiness.load(order_number);
+
+            if(order.getState() != OrderState.TARA_REGISTERED){
+                throw BusinessException.builder().message("El estado es incorrecto:" + order.getState())
+                   .build();
+            }
+
             if(charge.getCaudal()<=0){
                 throw BusinessException.builder().message("El caudal debe ser mayor a 0:" + charge.getCaudal())
                    .build();
             }
-
-            order = orderBusiness.load(order_number);
 
             if (order.getAccumulatedMass() != null && charge.getAccumulatedMass() < order.getAccumulatedMass()) {
                 throw BusinessException.builder()
@@ -113,11 +118,9 @@ public class OrderBusinessCharging extends OrderBusiness implements IOrderBusine
             if (order.getDensity() == null &&
                 order.getAccumulatedMass() == null &&
                 order.getTemperature() == null &&
-                order.getCaudal() == null &&
-                order.getState() == OrderState.TARA_REGISTERED){
+                order.getCaudal() == null){
 
                 order.setStartLoading(LocalDateTime.now());
-                order.setState(OrderState.LOADING);
 
                 orderDetailDAO.save(detail);
                 return orderDAO.save(order);
@@ -138,6 +141,27 @@ public class OrderBusinessCharging extends OrderBusiness implements IOrderBusine
 
         // Aqui se guarda en la base de datos el producto deserializado
 		return  orderDAO.save(order);
+
+    }
+
+    public Order changeStateLoaded(String number) throws BusinessException, NotFoundException{
+        
+        Order order = new Order();
+        try {
+            order = orderBusiness.load(number);
+        } catch(Exception e) {
+            log.error(e.getMessage(), e);
+            throw BusinessException.builder().ex(e).build();
+        }
+        if(order == null) {
+            throw NotFoundException.builder().message("No se encuentra la Orden con número: " + number).build();
+        }
+        if(order.getState() != OrderState.TARA_REGISTERED){
+            throw BusinessException.builder().message("Esta orden se encuentra en un estado no permitido: " + order.getState()).build();
+        }
+        order.setState(OrderState.LOADING);       
+        return orderDAO.save(order);
+        
 
     }
 
