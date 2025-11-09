@@ -1,0 +1,20 @@
+number,external_code,driver_name,driver_surname,driver_dni,driver_external_code,client_company_name,client_contact_name,client_external_code,product_name,product_description,product_external_code,truck_domain,truck_description,truck_cisterns,truck_external_code,preset
+Orden700,code700,Jose Gaston,Zaragosi,05000001,00001,FADEA2,Enrique Segoviano,22222,Gasolina Aguada,Gasolina Ferrique,33333,KK900,Camión cisterna,"[1000,2000]",44444,1000.0
+Orden701,code701,Lucía,Gómez,05000002,00002,HidroLiq,Marcos Díaz,22223,Agua tratada,Agua purificada,33334,AA101,Camión de agua potable,"[1500,1500]",44445,1500.0
+Orden702,code702,Juan,López,05000003,00003,TransLíquidos,Laura Ríos,22224,Combustible Diesel,Combustible pesado,33335,BB202,Camión de combustible,"[2000]",44446,2000.0
+Orden703,code703,Sofía,Ruiz,05000004,00004,Líquidos del Sur,Pedro Méndez,22225,Agua industrial,Agua no potable,33336,CC303,Camión cisterna doble,"[1000,2000,3000]",44447,1200.0
+Orden704,code704,Carlos,Fernández,05000005,00005,Agua Clara SA,Martina Vega,22226,Solvente X,Producto químico,33337,DD404,Camión químico,"[500,800]",44448,800.0
+Orden705,code705,Elena,Ramos,05000006,00006,Aqualia,Tomas Luna,22227,Agua liviana,Agua para refrigeración,33338,EE505,Camión cisterna liviano,"[600,700]",44449,700.0
+Orden706,code706,Martín,Pérez,05000007,00007,HidroNorte,Lucía Roldán,22228,Gasolina Ferrique,Gasolina procesada,33339,FF606,Camión cisterna estándar,"[1000,2000]",44450,1000.0
+Orden707,code707,Valeria,Molina,05000008,00008,Líquidos SRL,Germán Díaz,22229,Etanol,Combustible alternativo,33340,GG707,Camión etanolero,"[1800,2200]",44451,1800.0
+Orden708,code708,Andrés,Ruiz,05000009,00009,FADEA3,Alejandro Suárez,22230,Agua contaminada,Residuos líquidos,33341,HH808,Camión de residuos,"[1200,1300]",44452,1200.0
+Orden709,code709,Florencia,Torres,05000010,00010,HidroClean,Valeria Muñoz,22231,Agua limpia,Agua purificada,33342,II909,Camión limpieza,"[1500]",44453,1500.0
+Orden710,code710,Matías,Silva,05000011,00011,Líquidos del Centro,Daniel Acuña,22232,Nafta común,Combustible estándar,33343,JJ010,Camión de nafta,"[2000]",44454,2000.0
+Orden711,code711,Paula,Castro,05000012,00012,Agua Norte,María Luz,22233,Agua mineral,Agua potable premium,33344,KK011,Camión refrigerado,"[1000,1200]",44455,1200.0
+Orden712,code712,Diego,Luna,05000013,00013,TransAgua,Ernesto Vega,22234,Gasóleo,Combustible pesado,33345,LL012,Camión pesado,"[3000,3200]",44456,3000.0
+Orden713,code713,Julieta,Paz,05000014,00014,FADEA4,Gonzalo Ruiz,22235,Agua no tratada,Agua cruda,33346,MM013,Camión rural,"[900,950]",44457,900.0
+Orden714,code714,Ramiro,Santos,05000015,00015,HidroAndes,Sofía Díaz,22236,Químico Z,Solvente industrial,33347,NN014,Camión químico,"[1100,1200]",44458,1100.0
+Orden715,code715,Carla,Nuñez,05000016,00016,Aqualab,Ignacio Torres,22237,Agua destilada,Agua purificada,33348,OO015,Camión laboratorio,"[500,600]",44459,600.0
+Orden716,code716,Ignacio,Leiva,05000017,00017,HidroCentro,Esteban Vera,22238,Gasolina Eco,Combustible ecológico,33349,PP016,Camión cisterna ecológico,"[1500,2000]",44460,1500.0
+Orden717,code717,Camila,Prieto,05000018,00018,TransLiqua,Lucía López,22239,Agua fría,Agua refrigerada,33350,QQ017,Camión refrigerante,"[1300,1600]",44461,1300.0
+Orden718,code718,Gonzalo,Méndez,05000019,00019,FADEA5,Valentín Gómez,22240,Gas natural,Combustible gaseoso,33351,RR018,Camión gasero,"[180]()
