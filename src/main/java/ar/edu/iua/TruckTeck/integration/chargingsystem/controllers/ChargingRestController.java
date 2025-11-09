@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ar.edu.iua.TruckTeck.model.Order;
@@ -74,6 +75,21 @@ public class ChargingRestController {
         }
     }
 
+    /**
+     * Crea una orden recibida desde un sistema externo de carga (integración B2B).
+     * <p>
+     * Este endpoint recibe un payload de texto plano o JSON representando los datos de la orden.
+     * Devuelve un encabezado <b>Location</b> con la referencia del recurso creado.
+     *
+     * @param httpEntity Entidad HTTP que contiene el cuerpo (payload) enviado por el sistema B2B.
+     * @return Un {@link ResponseEntity} con:
+     *         <ul>
+     *             <li>HTTP 201 (Created) si la orden fue creada correctamente, incluyendo header <i>location</i>.</li>
+     *             <li>HTTP 400 (Bad Request) si los datos son inválidos o faltan campos obligatorios.</li>
+     *             <li>HTTP 302 (Found) si algún recurso relacionado no se encuentra disponible.</li>
+     *             <li>HTTP 500 (Internal Server Error) si ocurre un error interno de negocio.</li>
+     *         </ul>
+     */
     @Operation(operationId = "add-external-charging", summary = "Crea una orden desde el sistema de carga (B2B)")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Payload recibido desde el sistema B2B (texto/JSON)", required = true, content = @Content(mediaType = "text/plain", schema = @Schema(type = "string")))
     @ApiResponses(value = {
@@ -112,25 +128,38 @@ public class ChargingRestController {
         }
     }
 
-    @Operation(operationId = "mark-loaded", summary = "Marca una orden como 'loaded' desde el sistema de carga (B2B)")
+    /**
+     * Marca una orden como "cargada" (loaded) desde el sistema externo de carga (B2B).
+     * <p>
+     * Este endpoint actualiza el estado de la orden para indicar que el proceso de carga fue completado.
+     *
+     * @param number Número de la orden que se desea marcar como cargada.
+     * @return Un {@link ResponseEntity} que contiene:
+     *         <ul>
+     *             <li>HTTP 200 (OK) si la orden fue marcada exitosamente como cargada.</li>
+     *             <li>HTTP 302 (Found) si el recurso relacionado no se encuentra.</li>
+     *             <li>HTTP 500 (Internal Server Error) si ocurre una excepción de negocio.</li>
+     *         </ul>
+     */
+    @Operation(operationId = "patch-mark-loaded", summary = "Marca una orden como 'loaded' desde el sistema de carga (B2B)")
     @Parameter(in = ParameterIn.PATH, name = "number", schema = @Schema(type = "string"), required = true, description = "Número de la orden a marcar como cargada")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "Orden marcada como cargada y creada/actualizada"),
+        @ApiResponse(responseCode = "200", description = "Orden marcada como cargada y creada/actualizada"),
         @ApiResponse(responseCode = "302", description = "Recurso relacionado no encontrado", content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardResponse.class))),
         @ApiResponse(responseCode = "500", description = "Error interno", content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardResponse.class)))
     })
-    @PostMapping(value = "loaded/b2b/{number}")
+    @PatchMapping(value = "loaded/b2b/{number}")
     public ResponseEntity<?> loaded(@PathVariable String number) {
-		try {
-			Order response = orderBusiness.changeStateLoaded(number);
-			HttpHeaders responseHeaders = new HttpHeaders();
-			responseHeaders.set("location", Constants.URL_ORDERS_CHARGING + "/" + response.getId());
-			return new ResponseEntity<>(responseHeaders, HttpStatus.CREATED);
-		} catch (BusinessException e) {
-			return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),
-					HttpStatus.INTERNAL_SERVER_ERROR);
-		} catch (NotFoundException e) {
-			return new ResponseEntity<>(response.build(HttpStatus.FOUND, e, e.getMessage()), HttpStatus.FOUND);
-		}
+        try {
+            Order response = orderBusiness.changeStateLoaded(number);
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.set("location", Constants.URL_ORDERS_CHARGING + "/" + response.getId());
+            return ResponseEntity.status(HttpStatus.OK).headers(responseHeaders).build();
+        } catch (BusinessException e) {
+            return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(response.build(HttpStatus.FOUND, e, e.getMessage()), HttpStatus.FOUND);
         }
+    }
 }
