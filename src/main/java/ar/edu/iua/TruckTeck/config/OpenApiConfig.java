@@ -41,10 +41,10 @@ public class OpenApiConfig {
                .title("TruckTeck - Ing Web 3")
                .description("API Backend - Ing Web 3\n\n" + contributors)
                .version("v1.0")
-               .contact(new Contact()
+               /* .contact(new Contact()
                    .name("MasterxDual")
                    .url("https://github.com/MasterxDual")
-                   .email("agustinbram@gmail.com"))
+                   .email("agustinbram@gmail.com")) */
                .termsOfService("TOC")
                .license(new License().name("License").url("#"))
            );
