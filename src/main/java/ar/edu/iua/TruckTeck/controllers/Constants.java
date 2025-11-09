@@ -70,6 +70,12 @@ public class Constants {
      */
     public static final String URL_ORDERS_SAP = URL_ORDERS + "/sap";
 
+
+    public static final String URL_ORDERS_CHARGING = URL_BASE + "/charging";
+
+    public static final long FREQUENCY = 10; // segundos
+
+
     /**
     * URL del endpoint de integración.
     * Construida a partir de {@link #URL_BASE} y la ruta específica "/integration".
