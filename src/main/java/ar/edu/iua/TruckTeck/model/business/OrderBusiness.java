@@ -156,11 +156,34 @@ public class OrderBusiness implements IOrderBusiness {
     @Override
     public Order add(Order order) throws BusinessException, FoundException {
         try {
-            load(order.getId());
-            throw FoundException.builder().message("Se encontró la orden con id: " + order.getId()).build();
+            // load(order.getId());
+            load(order.getNumber());
+            throw FoundException.builder().message("Se encontró la orden con el numero: " + order.getNumber()).build();
         } catch(NotFoundException e) {
         }
 
+        validateOrderEntities(order);
+
+        try {
+            return orderDAO.save(order);
+        } catch(Exception e) {
+            log.error(e.getMessage(), e);
+            throw BusinessException.builder().ex(e).build();
+        }
+    }
+
+    /**
+     * Valida y asegura que las entidades relacionadas de una orden (Cliente, Camión, Producto, Chofer)
+     * existan en el sistema. Si alguna entidad no existe, la crea.
+     * <p>
+     * Este método es utilizado antes de agregar o actualizar una orden para garantizar
+     * la integridad referencial de las entidades relacionadas.
+     * </p>
+     * @param order
+     * @throws BusinessException
+     * @throws FoundException
+      */
+    public void validateOrderEntities(Order order) throws BusinessException, FoundException {
         try {
             Client client = clientBusiness.load(order.getClient().getCompanyName());
             if (client != null)
@@ -172,7 +195,6 @@ public class OrderBusiness implements IOrderBusiness {
             } catch (NotFoundException f) {
             }
         }
-        
 
         try {
             Truck truck = truckBusiness.load(order.getTruck().getDomain());
@@ -185,7 +207,6 @@ public class OrderBusiness implements IOrderBusiness {
             } catch (NotFoundException f) {
             }
         }
-        
 
         try {
             Product product = productBusiness.load(order.getProduct().getName());
@@ -210,14 +231,6 @@ public class OrderBusiness implements IOrderBusiness {
             } catch (NotFoundException f) {
             }
         }
-
-        try {
-            return orderDAO.save(order);
-        } catch(Exception e) {
-            log.error(e.getMessage(), e);
-            throw BusinessException.builder().ex(e).build();
-        }
-
     }
 
     /**
@@ -235,6 +248,8 @@ public class OrderBusiness implements IOrderBusiness {
     @Override
     public Order update(Order order) throws FoundException, BusinessException, NotFoundException {
         load(order.getId());
+
+        validateOrderEntities(order);
 
         try {
             return orderDAO.save(order);
