@@ -71,6 +71,7 @@ public class OrderBusinessCharging extends OrderBusiness implements IOrderBusine
         Order order = null;
         
 		try {
+            //Datos que llegan
 			charge = mapper.readValue(json, Order.class);
 
             // Se obtiene el número de la orden del objeto JSON recibido
@@ -82,25 +83,29 @@ public class OrderBusinessCharging extends OrderBusiness implements IOrderBusine
                    .message("El número de la orden es obligatorio")
                    .build();
             }
-
+            //Datos que tiene la orden
             order = orderBusiness.load(order_number);
 
+            //validar que la orden este en el estado correcto
             if(order.getState() != OrderState.TARA_REGISTERED){
                 throw BusinessException.builder().message("El estado es incorrecto:" + order.getState())
                    .build();
             }
 
+            //validar que la el caudal sea igual o mayor a 0
             if(charge.getCaudal()<=0){
                 throw BusinessException.builder().message("El caudal debe ser mayor a 0:" + charge.getCaudal())
                    .build();
             }
 
+            //validar que la masa acumulada sea mayor a la anterior
             if (order.getAccumulatedMass() != null && charge.getAccumulatedMass() < order.getAccumulatedMass()) {
                 throw BusinessException.builder()
                 .message("La masa acumulada contiene información errónea: " + charge.getAccumulatedMass())
                 .build();
             }
 
+            //rellena los datos en el detail
             OrderDetail detail = new OrderDetail();
             detail.setDensity(charge.getDensity());
             detail.setAccumulatedMass(charge.getAccumulatedMass());
@@ -109,7 +114,7 @@ public class OrderBusinessCharging extends OrderBusiness implements IOrderBusine
             detail.setTimestamp(LocalDateTime.now());
             detail.setOrder(order);
 
-
+            //Primera carga
             if (order.getDensity() == null &&
             order.getAccumulatedMass() == null &&
             order.getTemperature() == null &&
@@ -120,6 +125,7 @@ public class OrderBusinessCharging extends OrderBusiness implements IOrderBusine
 
             }
 
+            //Los datos que llegan van actualizando la orden
             order.setEndLoading(LocalDateTime.now());
             order.setAccumulatedMass(charge.getAccumulatedMass());
             order.setDensity(charge.getDensity());

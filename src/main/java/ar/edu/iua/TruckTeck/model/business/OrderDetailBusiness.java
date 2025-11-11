@@ -1,8 +1,13 @@
 package ar.edu.iua.TruckTeck.model.business;
 
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import ar.edu.iua.TruckTeck.model.Order;
+import ar.edu.iua.TruckTeck.model.OrderDetail;
 import ar.edu.iua.TruckTeck.model.business.exceptions.BusinessException;
 import ar.edu.iua.TruckTeck.model.business.exceptions.NotFoundException;
 import ar.edu.iua.TruckTeck.model.persistence.OrderDetailRepository;
@@ -63,5 +68,14 @@ public class OrderDetailBusiness implements IOrderDetailBusiness {
             throw NotFoundException.builder().message("No se encontraron detalles de orden para el ID proporcionado: " + orderId).build();
         }
         return avgFlow;
+    }
+
+    public List<OrderDetail> listId(Long orderID) throws BusinessException {
+        try {
+            return detailDAO.findByOrderId(orderID);
+        } catch(Exception e) {
+            log.error(e.getMessage(), e);
+            throw BusinessException.builder().ex(e).message(e.getMessage()).build();
+        }
     }
 }

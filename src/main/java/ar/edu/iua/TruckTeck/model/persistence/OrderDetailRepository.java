@@ -3,6 +3,7 @@ package ar.edu.iua.TruckTeck.model.persistence;
 import ar.edu.iua.TruckTeck.model.OrderDetail;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -27,4 +28,9 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
 
     @Query("SELECT AVG(d.caudal) FROM OrderDetail d WHERE d.order.id = :orderId")
     Double findAverageCaudalByOrderId(@Param("orderId") Long orderId);
+
+    List<OrderDetail> findByOrderId(Long orderId);
+    
+
+
 }
