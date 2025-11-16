@@ -38,16 +38,35 @@ public class OrderBusinessCharging extends OrderBusiness implements IOrderBusine
     @Autowired
     private OrderRepository orderDAO;
 
+    /**
+     * Repositorio para acceder a los detalles de las órdenes.
+     * <p>
+     * Inyectado automáticamente por Spring.
+     * </p>
+     */
     @Autowired
     private OrderDetailRepository orderDetailDAO;
 
+    /**
+     * Capa de negocio encargada de la lógica central de las órdenes.
+     * <p>
+     * Inyectado automáticamente por Spring.
+     * </p>
+     */
     @Autowired
     private IOrderBusiness orderBusiness;
 
 
-
+    /**
+     * Obtiene el valor preestablecido (preset) asociado a un número de orden y código de activación.
+     *
+     * @param activationCode Código de activación asociado a la orden.
+     * @param number Número identificador de la orden.
+     * @return El valor preestablecido (preset) correspondiente a la orden indicada.
+     * @throws BusinessException Si ocurre un error inesperado en la capa de negocio o durante la consulta.
+     * @throws NotFoundException Si no se encuentra una orden que coincida con el número y el código de activación proporcionados.
+     */
     public Double getPreset(String activationCode, String number) throws BusinessException, NotFoundException{
-
         Optional<Order> r;
 
         try {
@@ -60,16 +79,28 @@ public class OrderBusinessCharging extends OrderBusiness implements IOrderBusine
             throw NotFoundException.builder().message("La orden o el codigo incorrecto, orden: " + number + "/codigo:" + activationCode).build();
         }
         return r.get().getPreset();
-        
     }
 
+    /**
+     * Agrega una nueva orden a partir de una representación externa en formato JSON.
+     * <p>
+     * Este método valida los campos recibidos, verifica el estado actual de la orden
+     * y registra los detalles de carga correspondientes.
+     * </p>
+     *
+     * @param json Cadena en formato JSON que contiene los datos de la orden a registrar.
+     * @return La entidad {@link Order} actualizada y persistida en la base de datos.
+     * @throws BusinessException Si ocurre un error inesperado en la capa de negocio o si los datos son inconsistentes.
+     * @throws EmptyFieldException Si el número de la orden viene vacío o nulo.
+     * @throws NotFoundException Si no se encuentra la orden correspondiente al número recibido.
+     */
     public Order addExternalCharging(String json) throws BusinessException, EmptyFieldException, NotFoundException{
-        
+
         ObjectMapper mapper = JsonUtiles.getObjectMapper(Order.class,
 				new OrderChargingJsonDeserializar(Order.class),null);
 		Order charge = null;
         Order order = null;
-        
+
 		try {
 			charge = mapper.readValue(json, Order.class);
 
@@ -143,8 +174,16 @@ public class OrderBusinessCharging extends OrderBusiness implements IOrderBusine
 
     }
 
+    /**
+     * Cambia el estado de una orden a “cargada” (LOADING) según el número de referencia proporcionado.
+     *
+     * @param number Número identificador de la orden cuyo estado será modificado.
+     * @return La entidad {@link Order} actualizada con el nuevo estado.
+     * @throws BusinessException Si ocurre un error inesperado en la capa de negocio o si la orden está en un estado no permitido.
+     * @throws NotFoundException Si no se encuentra una orden con el número de referencia especificado.
+     */
     public Order changeStateLoaded(String number) throws BusinessException, NotFoundException{
-        
+
         Order order = new Order();
         try {
             order = orderBusiness.load(number);

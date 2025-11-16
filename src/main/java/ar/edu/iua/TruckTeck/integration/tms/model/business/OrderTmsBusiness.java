@@ -51,21 +51,21 @@ import ar.edu.iua.TruckTeck.model.persistence.OrderStatusLogRepository;
  */
 @Service
 public class OrderTmsBusiness implements IOrderTmsBusiness {
-    
+
     private static final Logger log = LoggerFactory.getLogger(OrderTmsBusiness.class);
-    
+
     /**
      * Repositorio para acceso a datos de órdenes.
      */
     @Autowired
     private OrderRepository orderRepository;
-    
+
     /**
      * Repositorio para registro de auditoría de cambios de estado.
      */
     @Autowired
     private OrderStatusLogRepository orderStatusLogRepository;
-    
+
     /**
      * Registra la tara inicial de una orden basada en el número de orden y el peso inicial del camión vacío.
      * 
@@ -87,9 +87,9 @@ public class OrderTmsBusiness implements IOrderTmsBusiness {
     @Override
     public Order registerInitialWeighing(String number, Double initialWeight) 
             throws BusinessException, NotFoundException, FoundException {
-        
+
         log.info("TMS: Registrando pesaje inicial para camión {} con peso {}", number, initialWeight);
-        
+
         try {
             // 1. Buscar una orden pendiente para este camión por dominio
             // Optional<Order> orderOpt = orderRepository.findByTrucknumberAndState(number, OrderState.PENDING);
@@ -101,38 +101,38 @@ public class OrderTmsBusiness implements IOrderTmsBusiness {
             }
             // 2. Obtener la orden
             Order order = orderOpt.get();
-            
+
             // 3. Validar que la orden esté en el estado correcto
             if (order.getState() != OrderState.PENDING) {
                 throw new BusinessException(
                     "La orden " + order.getNumber() + " no está en estado PENDING. Estado actual: " + order.getState()
                 );
             }
-            
+
             // 4. Generar código de activación único de 5 dígitos
             String activationCode = generateActivationCode();
-            
+
             // 5. Registrar datos del pesaje inicial
             order.setInitialWeight(initialWeight);
             order.setActivationCode(activationCode);
             order.setInitialWeighing(LocalDateTime.now());
-            
+
             // 6. Cambiar estado a TARA_REGISTERED
             OrderState previousState = order.getState();
             order.setState(OrderState.TARA_REGISTERED);
-            
+
             // 7. Guardar la orden
             Order savedOrder = orderRepository.save(order);
-            
+
             // 8. Registrar el cambio de estado en el log
             logStateChange(savedOrder, previousState, OrderState.TARA_REGISTERED, 
                 "TMS", "Pesaje inicial registrado. Peso: " + initialWeight + " kg");
-            
+
             log.info("TMS: Pesaje inicial registrado exitosamente. Orden: {}, Código: {}", 
                 savedOrder.getNumber(), activationCode);
-            
+
             return savedOrder;
-            
+
         } catch (NotFoundException e) {
             log.error("TMS: Error al registrar pesaje inicial: {}", e.getMessage());
             throw e;
@@ -230,7 +230,7 @@ public class OrderTmsBusiness implements IOrderTmsBusiness {
             throw new BusinessException("Error al registrar el pesaje final: " + e.getMessage());
         }
     }
-    
+
     /**
      * Genera un código de activación aleatorio de 5 dígitos.
      * <p>
@@ -252,7 +252,7 @@ public class OrderTmsBusiness implements IOrderTmsBusiness {
         int code = random.nextInt(100000); // Genera número entre 0 y 99999
         return String.format("%05d", code); // Formatea con ceros a la izquierda si es necesario
     }
-    
+
     /**
      * Registra un cambio de estado en el log de auditoría (OrderStatusLog).
      * <p>
