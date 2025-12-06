@@ -5,7 +5,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -66,7 +65,6 @@ public class ClientRestController {
      *         - {@link HttpStatus#OK} si la operación fue exitosa.
      *         - {@link HttpStatus#INTERNAL_SERVER_ERROR} si ocurre un {@link BusinessException}.
      */
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(operationId = "list-clients", summary = "Lista todos los clientes.")
     @ApiResponses(value = {
@@ -95,7 +93,6 @@ public class ClientRestController {
      *         - {@link HttpStatus#FOUND} si ya existe un cliente similar ({@link FoundException}).
      *         - {@link HttpStatus#INTERNAL_SERVER_ERROR} si ocurre un {@link BusinessException}.
      */
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(value = "")
     @Operation(operationId = "add-client", summary = "Crea un nuevo cliente.")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Cliente a crear", required = true, content = @Content(mediaType = "application/json", schema = @Schema(implementation = Client.class)))
@@ -126,7 +123,6 @@ public class ClientRestController {
      *         o un mensaje de error si ocurre una excepción de negocio (HTTP 500)
      *         o si no se encuentra el cliente (HTTP 404).
      */
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(value = "/{id}")
     @Operation(operationId = "load-client", summary = "Carga un cliente por su id.")
     @Parameter(in = ParameterIn.PATH, name = "id", schema = @Schema(type = "long"), required = true, description = "Identificador del cliente.")
@@ -153,7 +149,6 @@ public class ClientRestController {
      *         o un mensaje de error si ocurre una excepción de negocio (HTTP 500)
      *         o si no se encuentra el cliente (HTTP 404).
      */
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(value = "/by-companyName/{companyName}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(operationId = "load-client-by-companyName", summary = "Carga un cliente por su nombre de compañía.")
     @Parameter(in = ParameterIn.PATH, name = "companyName", schema = @Schema(type = "string"), required = true, description = "Nombre de la compañía del cliente a buscar")
@@ -181,7 +176,6 @@ public class ClientRestController {
      *         o si el cliente no existe (HTTP 404)
      *         o si el cliente existe (HTTP 302).
      */
-    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "")
     @Operation(operationId = "update-client", summary = "Actualiza un cliente existente.")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Cliente con datos a actualizar", required = true, content = @Content(mediaType = "application/json", schema = @Schema(implementation = Client.class)))
@@ -213,7 +207,6 @@ public class ClientRestController {
      *         o un mensaje de error si ocurre una excepción de negocio (HTTP 500)
      *         o si el cliente no existe (HTTP 404).
      */
-    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping(value = "/{id}")
     @Operation(operationId = "delete-client", summary = "Elimina un cliente por su id.")
     @Parameter(in = ParameterIn.PATH, name = "id", schema = @Schema(type = "long"), required = true, description = "Identificador del cliente a eliminar")

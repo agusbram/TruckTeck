@@ -6,7 +6,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -68,7 +67,6 @@ public class ProductRestController {
      *         - {@link HttpStatus#OK} si la operación fue exitosa.
      *         - {@link HttpStatus#INTERNAL_SERVER_ERROR} si ocurre un {@link BusinessException}.
      */
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(operationId = "list-products", summary = "Lista todos los productos.")
     @ApiResponses(value = {
@@ -97,7 +95,6 @@ public class ProductRestController {
      *         - {@link HttpStatus#FOUND} si ya existe un producto similar ({@link FoundException}).
      *         - {@link HttpStatus#INTERNAL_SERVER_ERROR} si ocurre un {@link BusinessException}.
      */
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(value = "")
     @Operation(operationId = "add-product", summary = "Crea un nuevo producto.")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Producto a crear", required = true, content = @Content(mediaType = "application/json", schema = @Schema(implementation = Product.class)))
@@ -128,7 +125,6 @@ public class ProductRestController {
      *         o un mensaje de error si ocurre una excepción de negocio (HTTP 500)
      *         o si no se encuentra el producto (HTTP 404).
      */
-    @PreAuthorize("hasRole('ADMIN')")
     @Operation(operationId = "load-product", summary = "Este servicio permite cargar un producto por su id.")
 	@Parameter(in = ParameterIn.PATH, name = "id", schema = @Schema(type = "long"), required = true, description = "Identificador del producto.")
 	@ApiResponses(value = { 
@@ -162,7 +158,6 @@ public class ProductRestController {
      *         o un mensaje de error si ocurre una excepción de negocio (HTTP 500)
      *         o si no se encuentra el producto (HTTP 404).
      */
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(value = "/by-name/{product}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(operationId = "load-product-by-name", summary = "Carga un producto por su nombre.")
     @Parameter(in = ParameterIn.PATH, name = "product", schema = @Schema(type = "string"), required = true, description = "Nombre del producto a buscar")
@@ -190,7 +185,6 @@ public class ProductRestController {
      *         o si el producto no existe (HTTP 404)
      *         o si el producto existe (HTTP 302).
      */
-    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "")
     @Operation(operationId = "update-product", summary = "Actualiza un producto existente.")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Producto con datos a actualizar", required = true, content = @Content(mediaType = "application/json", schema = @Schema(implementation = Product.class)))
@@ -222,7 +216,6 @@ public class ProductRestController {
      *         o un mensaje de error si ocurre una excepción de negocio (HTTP 500)
      *         o si el producto no existe (HTTP 404).
      */
-    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping(value = "/{id}")
     @Operation(operationId = "delete-product", summary = "Elimina un producto por su id.")
     @Parameter(in = ParameterIn.PATH, name = "id", schema = @Schema(type = "long"), required = true, description = "Identificador del producto a eliminar")
