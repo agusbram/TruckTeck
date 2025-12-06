@@ -7,6 +7,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -73,6 +74,7 @@ public class TruckRestController {
         @ApiResponse(responseCode = "200", description = "Devuelve la lista de camiones.", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Truck.class)))),
         @ApiResponse(responseCode = "500", description = "Error interno", content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardResponse.class)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> list() {
         try {
@@ -103,6 +105,7 @@ public class TruckRestController {
         @ApiResponse(responseCode = "302", description = "Camión ya existe", content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardResponse.class))),
         @ApiResponse(responseCode = "500", description = "Error interno", content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardResponse.class)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(value = "")
     public ResponseEntity<?> add(@RequestBody Truck truck) {
         try {
@@ -133,6 +136,7 @@ public class TruckRestController {
         @ApiResponse(responseCode = "500", description = "Error interno", content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardResponse.class))),
         @ApiResponse(responseCode = "404", description = "No se encuentra el camión para el identificador informado", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = StandardResponse.class))})
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(value = "/{id}")
     public ResponseEntity<?> load(@PathVariable long id) {
         try {
@@ -159,6 +163,7 @@ public class TruckRestController {
         @ApiResponse(responseCode = "500", description = "Error interno", content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardResponse.class))),
         @ApiResponse(responseCode = "404", description = "No se encuentra el camión para el dominio informado", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = StandardResponse.class))})
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(value = "/by-name/{truck}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> load(@PathVariable String truck) {
         try {
@@ -187,6 +192,7 @@ public class TruckRestController {
         @ApiResponse(responseCode = "302", description = "Conflicto: camión ya existe", content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardResponse.class))),
         @ApiResponse(responseCode = "500", description = "Error interno", content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardResponse.class)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "")
     public ResponseEntity<?> update(@RequestBody Truck truck) {
         try {
@@ -217,6 +223,7 @@ public class TruckRestController {
         @ApiResponse(responseCode = "404", description = "Camión no encontrado", content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardResponse.class))),
         @ApiResponse(responseCode = "500", description = "Error interno", content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardResponse.class)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<?> delete(@PathVariable long id) {
         try {
