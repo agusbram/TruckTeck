@@ -16,6 +16,7 @@ import ar.edu.iua.TruckTeck.model.Order;
 import ar.edu.iua.TruckTeck.model.OrderDetail;
 import ar.edu.iua.TruckTeck.model.business.IOrderBusiness;
 import ar.edu.iua.TruckTeck.model.business.OrderBusiness;
+import ar.edu.iua.TruckTeck.model.business.TemperatureAlertConfigBusiness;
 import ar.edu.iua.TruckTeck.model.business.exceptions.BusinessException;
 import ar.edu.iua.TruckTeck.model.business.exceptions.EmptyFieldException;
 import ar.edu.iua.TruckTeck.model.business.exceptions.NotFoundException;
@@ -29,6 +30,9 @@ import ar.edu.iua.TruckTeck.controllers.Constants;
 @Service
 @Slf4j
 public class OrderBusinessCharging extends OrderBusiness implements IOrderBusinessCharging{
+
+    @Autowired
+    private TemperatureAlertConfigBusiness temperatureAlertConfigBusiness;
 
     /**
      * Repositorio para acceder a los datos de órdenes.
@@ -167,6 +171,14 @@ public class OrderBusinessCharging extends OrderBusiness implements IOrderBusine
             if (lastTimestamp == null ||
                 Duration.between(lastTimestamp, detail.getTimestamp()).getSeconds() >= Constants.FREQUENCY) {
                 orderDetailDAO.save(detail);
+            }
+            // Verifica si la temperatura supera el límite y manda mail si corresponde
+            try {
+                boolean alertSent = temperatureAlertConfigBusiness.checkAndSendAlert(charge.getTemperature());
+                if (alertSent)
+                    messagingTemplate.convertAndSend("/topic/alarm", true);
+            } catch (NotFoundException e) {
+                log.error("No se pudo verificar alerta de temperatura: " + e.getMessage());
             }
             // Notificar a los suscriptores sobre el nuevo detalle de la orden
             messagingTemplate.convertAndSend("/topic/detail", detail);

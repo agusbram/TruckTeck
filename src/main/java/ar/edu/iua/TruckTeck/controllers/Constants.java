@@ -75,6 +75,8 @@ public class Constants {
 
     public static final String URL_LOGIN = URL_BASE + "/login";
 
+    public static final String URL_ALARM = URL_BASE + "/alarm";
+
     public static final long FREQUENCY = 10; // segundos
 
 
