@@ -264,6 +264,39 @@ public class OrderRestController {
         }
     }
 
+
+    /**
+     * Genera y descarga el PDF de conciliación de una orden.
+     *
+     * @param number Número de la orden.
+     * @return Array de bytes del PDF para descarga.
+     */
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    @Operation(operationId = "download-conciliation-pdf", summary = "Descarga el PDF de conciliación de una orden")
+    @Parameter(in = ParameterIn.PATH, name = "number", schema = @Schema(type = "string"), required = true, description = "Número de la orden")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "PDF generado correctamente", content = @Content(mediaType = "application/pdf")),
+        @ApiResponse(responseCode = "404", description = "Orden no encontrada o no finalizada", content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardResponse.class))),
+        @ApiResponse(responseCode = "500", description = "Error interno", content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardResponse.class)))
+    })
+    @GetMapping(value = "/number/{number}/conciliation/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
+    public ResponseEntity<?> downloadConciliationPdf(@PathVariable String number) {
+        try {
+            byte[] pdfBytes = orderBusiness.generateConciliationPdf(number);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", "Conciliacion_" + number + ".pdf");
+            headers.setContentLength(pdfBytes.length);
+
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(response.build(HttpStatus.NOT_FOUND, e, e.getMessage()), HttpStatus.NOT_FOUND);
+        } catch (BusinessException e) {
+            return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
 
 
