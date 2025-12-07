@@ -322,30 +322,29 @@ public class PdfGenerationService {
                 .setFontColor(getPrimaryColor())
                 .setMarginBottom(10));
 
-        Table weighingTable = new Table(UnitValue.createPercentArray(new float[]{40, 30, 30}))
+        Table weighingTable = new Table(UnitValue.createPercentArray(new float[]{60, 40}))
                 .useAllAvailableWidth();
 
         // Encabezado
         weighingTable.addHeaderCell(createHeaderCell("Concepto", fontBold));
         weighingTable.addHeaderCell(createHeaderCell("Valor (kg)", fontBold));
-        weighingTable.addHeaderCell(createHeaderCell("Estado", fontBold));
 
         // Datos
         addDataRow(weighingTable, "Peso Inicial (Tara)", 
                    String.format("%.2f", conciliation.getInitialWeight()), 
-                   "✓", fontRegular, GREEN);
+                   fontRegular);
         
         addDataRow(weighingTable, "Peso Final (Bruto)", 
                    String.format("%.2f", conciliation.getFinalWeight()), 
-                   "✓", fontRegular, GREEN);
+                   fontRegular);
         
         addDataRow(weighingTable, "Peso Neto (Balanza)", 
                    String.format("%.2f", conciliation.getNetWeight()), 
-                   "✓", fontRegular, GREEN);
+                   fontRegular);
         
-        addDataRow(weighingTable, "Producto Cargado (Caudalímetro)", 
+        addDataRow(weighingTable, "Producto Cargado / Masa Acumulada", 
                    String.format("%.2f", conciliation.getAccumulatedMass()), 
-                   "✓", fontRegular, GREEN);
+                   fontRegular);
 
         document.add(weighingTable);
         document.add(new Paragraph().setMarginBottom(15));
@@ -529,8 +528,19 @@ public class PdfGenerationService {
                 .setPadding(8);
     }
 
-    private void addDataRow(Table table, String label, String value, String extra, 
-                           PdfFont fontRegular, Color extraColor) {
+    private void addDataRow(Table table, String label, String value, PdfFont fontRegular) {
+        table.addCell(new Cell()
+                .add(new Paragraph(label).setFont(fontRegular).setFontSize(9))
+                .setPadding(6));
+        
+        table.addCell(new Cell()
+                .add(new Paragraph(value).setFont(fontRegular).setFontSize(9))
+                .setTextAlignment(TextAlignment.RIGHT)
+                .setPadding(6));
+    }
+
+    private void addDataRow(Table table, String label, String value, String unit, 
+                           PdfFont fontRegular, Color unitColor) {
         table.addCell(new Cell()
                 .add(new Paragraph(label).setFont(fontRegular).setFontSize(9))
                 .setPadding(6));
@@ -541,7 +551,7 @@ public class PdfGenerationService {
                 .setPadding(6));
         
         table.addCell(new Cell()
-                .add(new Paragraph(extra).setFont(fontRegular).setFontSize(9).setFontColor(extraColor))
+                .add(new Paragraph(unit).setFont(fontRegular).setFontSize(9).setFontColor(unitColor))
                 .setTextAlignment(TextAlignment.CENTER)
                 .setPadding(6));
     }
