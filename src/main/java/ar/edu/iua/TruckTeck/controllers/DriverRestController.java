@@ -5,6 +5,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -65,6 +66,7 @@ public class DriverRestController {
      *         - {@link HttpStatus#OK} si la operación fue exitosa.
      *         - {@link HttpStatus#INTERNAL_SERVER_ERROR} si ocurre un {@link BusinessException}.
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(operationId = "list-drivers", summary = "Lista todos los choferes.")
     @ApiResponses(value = {
@@ -93,6 +95,7 @@ public class DriverRestController {
      *         - {@link HttpStatus#FOUND} si ya existe un chofer similar ({@link FoundException}).
      *         - {@link HttpStatus#INTERNAL_SERVER_ERROR} si ocurre un {@link BusinessException}.
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(value = "")
     @Operation(operationId = "add-driver", summary = "Crea un nuevo chofer.")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Chofer a crear", required = true, content = @Content(mediaType = "application/json", schema = @Schema(implementation = Driver.class)))
@@ -123,6 +126,7 @@ public class DriverRestController {
      *         o un mensaje de error si ocurre una excepción de negocio (HTTP 500)
      *         o si no se encuentra el chofer (HTTP 404).
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(value = "/{id}")
     @Operation(operationId = "load-driver", summary = "Carga un chofer por su id.")
     @Parameter(in = ParameterIn.PATH, name = "id", schema = @Schema(type = "long"), required = true, description = "Identificador del chofer.")
@@ -149,6 +153,7 @@ public class DriverRestController {
      *         o un mensaje de error si ocurre una excepción de negocio (HTTP 500)
      *         o si no se encuentra el chofer (HTTP 404).
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(value = "/by-document/{documentNumber}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(operationId = "load-driver-by-document", summary = "Carga un chofer por su número de documento.")
     @Parameter(in = ParameterIn.PATH, name = "documentNumber", schema = @Schema(type = "string"), required = true, description = "Número de documento del chofer a buscar")
@@ -176,6 +181,7 @@ public class DriverRestController {
      *         o si el chofer no existe (HTTP 404)
      *         o si el chofer existe (HTTP 302).
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "")
     @Operation(operationId = "update-driver", summary = "Actualiza un chofer existente.")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Chofer con datos a actualizar", required = true, content = @Content(mediaType = "application/json", schema = @Schema(implementation = Driver.class)))
@@ -207,6 +213,7 @@ public class DriverRestController {
      *         o un mensaje de error si ocurre una excepción de negocio (HTTP 500)
      *         o si el chofer no existe (HTTP 404).
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping(value = "/{id}")
     @Operation(operationId = "delete-driver", summary = "Elimina un chofer por su id.")
     @Parameter(in = ParameterIn.PATH, name = "id", schema = @Schema(type = "long"), required = true, description = "Identificador del chofer a eliminar")

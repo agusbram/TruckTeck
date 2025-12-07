@@ -5,6 +5,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -70,6 +71,7 @@ public class OrderRestController {
         @ApiResponse(responseCode = "200", description = "Devuelve la lista de órdenes.", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Order.class)))),
         @ApiResponse(responseCode = "500", description = "Error interno", content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardResponse.class)))
     })
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> list() {
         try {
@@ -93,6 +95,7 @@ public class OrderRestController {
      *         - {@link HttpStatus#FOUND} si ya existe una orden similar ({@link FoundException}).
      *         - {@link HttpStatus#INTERNAL_SERVER_ERROR} si ocurre un {@link BusinessException}.
      */
+    @PreAuthorize("hasRole('ADMIN') or hasRole('SAP')")
     @Operation(operationId = "add-order", summary = "Crea una nueva orden.")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Orden a crear", required = true, content = @Content(mediaType = "application/json", schema = @Schema(implementation = Order.class)))
     @ApiResponses(value = {
@@ -123,6 +126,7 @@ public class OrderRestController {
      *         o un mensaje de error si ocurre una excepción de negocio (HTTP 500)
      *         o si no se encuentra la orden (HTTP 404).
      */
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     @Operation(operationId = "load-order", summary = "Carga una orden por su id.")
     @Parameter(in = ParameterIn.PATH, name = "id", schema = @Schema(type = "long"), required = true, description = "Identificador de la orden.")
     @ApiResponses(value = {
@@ -149,6 +153,7 @@ public class OrderRestController {
      *         o un mensaje de error si ocurre una excepción de negocio (HTTP 500)
      *         o si no se encuentra la orden (HTTP 404).
      */
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     @Operation(operationId = "load-order-by-number", summary = "Carga una orden por su número de orden.")
     @Parameter(in = ParameterIn.PATH, name = "number", schema = @Schema(type = "string"), required = true, description = "Número de la orden a buscar")
     @ApiResponses(value = {
@@ -177,6 +182,7 @@ public class OrderRestController {
      *         o si la orden no existe (HTTP 404)
      *         o si la orden ya existe (HTTP 302).
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(operationId = "update-order", summary = "Actualiza una orden existente.")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Orden con datos a actualizar", required = true, content = @Content(mediaType = "application/json", schema = @Schema(implementation = Order.class)))
     @ApiResponses(value = {
@@ -208,6 +214,7 @@ public class OrderRestController {
      *         o un mensaje de error si ocurre una excepción de negocio (HTTP 500)
      *         o si la orden no existe (HTTP 404).
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(operationId = "delete-order", summary = "Elimina una orden por su id.")
     @Parameter(in = ParameterIn.PATH, name = "id", schema = @Schema(type = "long"), required = true, description = "Identificador de la orden a eliminar")
     @ApiResponses(value = {
@@ -238,6 +245,7 @@ public class OrderRestController {
      * @return Un {@link ResponseEntity} que contiene el objeto {@link Conciliation} (HTTP 200 OK),
      *         o un mensaje de error si la orden no está finalizada o no existe (HTTP 404/500).
      */
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     @Operation(operationId = "get-conciliation", summary = "Obtiene la conciliación de una orden finalizada por su número de orden.")
     @Parameter(in = ParameterIn.PATH, name = "number", schema = @Schema(type = "string"), required = true, description = "Número de la orden a conciliar")
     @ApiResponses(value = {
