@@ -11,10 +11,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ar.edu.iua.TruckTeck.integration.chargingsystem.model.OrderChargingJsonDeserializar;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import ar.edu.iua.TruckTeck.model.Order;
 import ar.edu.iua.TruckTeck.model.OrderDetail;
 import ar.edu.iua.TruckTeck.model.business.IOrderBusiness;
 import ar.edu.iua.TruckTeck.model.business.OrderBusiness;
+import ar.edu.iua.TruckTeck.model.business.TemperatureAlertConfigBusiness;
 import ar.edu.iua.TruckTeck.model.business.exceptions.BusinessException;
 import ar.edu.iua.TruckTeck.model.business.exceptions.EmptyFieldException;
 import ar.edu.iua.TruckTeck.model.business.exceptions.NotFoundException;
@@ -28,6 +30,9 @@ import ar.edu.iua.TruckTeck.controllers.Constants;
 @Service
 @Slf4j
 public class OrderBusinessCharging extends OrderBusiness implements IOrderBusinessCharging{
+
+    @Autowired
+    private TemperatureAlertConfigBusiness temperatureAlertConfigBusiness;
 
     /**
      * Repositorio para acceder a los datos de órdenes.
@@ -56,6 +61,17 @@ public class OrderBusinessCharging extends OrderBusiness implements IOrderBusine
     @Autowired
     private IOrderBusiness orderBusiness;
 
+    /**
+    * Utilidad proporcionada por Spring para enviar mensajes a clientes conectados 
+    * mediante WebSocket usando el protocolo STOMP.
+    *
+    * <p>Esta plantilla permite publicar mensajes hacia destinos específicos 
+    * (topics, queues o usuarios individuales) a través del broker de mensajería. 
+    * Es inyectada automáticamente por el contenedor de Spring mediante la anotación
+    * {@code @Autowired}.</p>
+    */
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     /**
      * Obtiene el valor preestablecido (preset) asociado a un número de orden y código de activación.
@@ -163,6 +179,17 @@ public class OrderBusinessCharging extends OrderBusiness implements IOrderBusine
                 Duration.between(lastTimestamp, detail.getTimestamp()).getSeconds() >= Constants.FREQUENCY) {
                 orderDetailDAO.save(detail);
             }
+            // Verifica si la temperatura supera el límite y manda mail si corresponde
+            try {
+                log.info("Paso previo al enviar el email");
+                boolean alertSent = temperatureAlertConfigBusiness.checkAndSendAlert(charge.getTemperature());
+                if (alertSent)
+                    messagingTemplate.convertAndSend("/topic/alarm", true);
+            } catch (Exception e) {
+                log.error("No se pudo verificar alerta de temperatura: " + e.getMessage(), e);
+            }
+            // Notificar a los suscriptores sobre el nuevo detalle de la orden
+            messagingTemplate.convertAndSend("/topic/detail", detail);
 
 		} catch (JsonProcessingException e) {
 			log.error(e.getMessage(), e);

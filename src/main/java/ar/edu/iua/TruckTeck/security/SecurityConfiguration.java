@@ -1,5 +1,7 @@
 package ar.edu.iua.TruckTeck.security;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +16,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -121,8 +126,11 @@ public class SecurityConfiguration {
 		http.csrf(AbstractHttpConfigurer::disable);
 		// Define request authorization rules
 		http.authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.POST, Constants.URL_LOGIN).permitAll()
-				.requestMatchers("/v3/api-docs/**").permitAll().requestMatchers("/swagger-ui.html").permitAll()
-				.requestMatchers("/swagger-ui/**").permitAll().requestMatchers("/ui/**").permitAll()
+				.requestMatchers("/v3/api-docs/**").permitAll()
+                .requestMatchers("/swagger-ui.html").permitAll()
+				.requestMatchers("/swagger-ui/**").permitAll()
+                .requestMatchers("/ui/**").permitAll()
+                .requestMatchers("/ws/**").permitAll()
 				.requestMatchers("/demo/**").permitAll().anyRequest().authenticated());
 
 		// Enable HTTP Basic authentication (optional, for testing)
@@ -134,5 +142,50 @@ public class SecurityConfiguration {
 		return http.build();
 
 	}
+
+	/**
+ 	* Configura el manejo de CORS (Cross-Origin Resource Sharing) para la aplicación.
+ 	* <p>
+ 	* Este método define una política CORS personalizada especificando:
+ 	* <ul>
+ 	*   <li>Orígenes permitidos (frontend autorizado)</li>
+ 	*   <li>Métodos HTTP aceptados</li>
+ 	*   <li>Headers permitidos</li>
+ 	*   <li>Headers expuestos al cliente</li>
+ 	*   <li>Si las credenciales están permitidas o no</li>
+ 	* </ul>
+ 	* La configuración se aplica a todos los endpoints expuestos por el backend,
+ 	* incluyendo peticiones de WebSocket durante la fase de handshake.
+ 	*
+ 	* @return una instancia de {@link CorsConfigurationSource} con la política CORS aplicada.
+ 	*/
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+
+        CorsConfiguration config = new CorsConfiguration();
+
+        // Permite únicamente los orígenes del frontend (desarrollo local)
+        config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:5500"));
+
+        // Métodos HTTP permitidos en las solicitudes al backend
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+
+    	// Headers permitidos que el cliente puede enviar
+        config.setAllowedHeaders(List.of("*"));
+
+        // Headers expuestos al frontend (necesario para leer el JWT desde Authorization)
+        config.setExposedHeaders(List.of("Authorization"));
+
+		// Deshabilita el envío de cookies o credenciales en la solicitud
+        config.setAllowCredentials(false);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+
+        //Aplica a TODOS los endpoints (incluye WS handshake)
+		// Aplica la configuración CORS a todos los endpoints de la API
+        source.registerCorsConfiguration("/**", config);
+
+        return source;
+    }
 
 }
