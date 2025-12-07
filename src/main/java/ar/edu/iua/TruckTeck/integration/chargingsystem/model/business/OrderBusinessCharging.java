@@ -61,10 +61,17 @@ public class OrderBusinessCharging extends OrderBusiness implements IOrderBusine
     @Autowired
     private IOrderBusiness orderBusiness;
 
+    /**
+    * Utilidad proporcionada por Spring para enviar mensajes a clientes conectados 
+    * mediante WebSocket usando el protocolo STOMP.
+    *
+    * <p>Esta plantilla permite publicar mensajes hacia destinos específicos 
+    * (topics, queues o usuarios individuales) a través del broker de mensajería. 
+    * Es inyectada automáticamente por el contenedor de Spring mediante la anotación
+    * {@code @Autowired}.</p>
+    */
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
-
-
 
     /**
      * Obtiene el valor preestablecido (preset) asociado a un número de orden y código de activación.
@@ -174,11 +181,12 @@ public class OrderBusinessCharging extends OrderBusiness implements IOrderBusine
             }
             // Verifica si la temperatura supera el límite y manda mail si corresponde
             try {
+                log.info("Paso previo al enviar el email");
                 boolean alertSent = temperatureAlertConfigBusiness.checkAndSendAlert(charge.getTemperature());
                 if (alertSent)
                     messagingTemplate.convertAndSend("/topic/alarm", true);
-            } catch (NotFoundException e) {
-                log.error("No se pudo verificar alerta de temperatura: " + e.getMessage());
+            } catch (Exception e) {
+                log.error("No se pudo verificar alerta de temperatura: " + e.getMessage(), e);
             }
             // Notificar a los suscriptores sobre el nuevo detalle de la orden
             messagingTemplate.convertAndSend("/topic/detail", detail);

@@ -143,28 +143,46 @@ public class SecurityConfiguration {
 
 	}
 
+	/**
+ 	* Configura el manejo de CORS (Cross-Origin Resource Sharing) para la aplicación.
+ 	* <p>
+ 	* Este método define una política CORS personalizada especificando:
+ 	* <ul>
+ 	*   <li>Orígenes permitidos (frontend autorizado)</li>
+ 	*   <li>Métodos HTTP aceptados</li>
+ 	*   <li>Headers permitidos</li>
+ 	*   <li>Headers expuestos al cliente</li>
+ 	*   <li>Si las credenciales están permitidas o no</li>
+ 	* </ul>
+ 	* La configuración se aplica a todos los endpoints expuestos por el backend,
+ 	* incluyendo peticiones de WebSocket durante la fase de handshake.
+ 	*
+ 	* @return una instancia de {@link CorsConfigurationSource} con la política CORS aplicada.
+ 	*/
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
         CorsConfiguration config = new CorsConfiguration();
 
-        // 🔥 Permite tu frontend
-        config.setAllowedOriginPatterns(List.of("*"));
+        // Permite únicamente los orígenes del frontend (desarrollo local)
+        config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:5500"));
 
-        // 🔥 Métodos
+        // Métodos HTTP permitidos en las solicitudes al backend
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
-        // 🔥 Headers permitidos
+    	// Headers permitidos que el cliente puede enviar
         config.setAllowedHeaders(List.of("*"));
 
-        // 🔥 Exponer Authorization para leer el JWT
+        // Headers expuestos al frontend (necesario para leer el JWT desde Authorization)
         config.setExposedHeaders(List.of("Authorization"));
 
+		// Deshabilita el envío de cookies o credenciales en la solicitud
         config.setAllowCredentials(false);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
-        // 🔥 Aplica a TODOS los endpoints (incluye WS handshake)
+        //Aplica a TODOS los endpoints (incluye WS handshake)
+		// Aplica la configuración CORS a todos los endpoints de la API
         source.registerCorsConfiguration("/**", config);
 
         return source;
