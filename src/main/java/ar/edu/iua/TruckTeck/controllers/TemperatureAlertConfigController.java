@@ -5,6 +5,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -55,6 +56,7 @@ public class TemperatureAlertConfigController {
      * @return {@code 200 OK} con la configuración actualizada,
      *         o {@code 404 Not Found} si la configuración no existe.
      */
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     @Operation(operationId = "update-alarm-config", summary = "Actualiza la configuración de alerta de temperatura.")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Configuración a actualizar", required = true, content = @Content(mediaType = "application/json", schema = @Schema(implementation = TemperatureAlertConfig.class)))
     @ApiResponses(value = {
@@ -85,6 +87,7 @@ public class TemperatureAlertConfigController {
      * @return {@code 200 OK} si la bandera fue reseteada correctamente,
      *         o {@code 404 Not Found} si no se encuentra la configuración.
      */
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     @Operation(operationId = "reset-alarm-email-flag", summary = "Resetea la flag de envío de correo (emailAlreadySent).")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "La flag fue reseteada correctamente.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardResponse.class))),
@@ -118,6 +121,7 @@ public class TemperatureAlertConfigController {
      * @return {@code 201 Created} con la cabecera {@code Location} apuntando al recurso creado,
      *         o {@code 404 Not Found} si la operación no puede completarse.
      */
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     @Operation(operationId = "create-first-alarm-config", summary = "Crea la primera configuración del sistema.")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Configuración inicial a registrar", required = true, content = @Content(mediaType = "application/json", schema = @Schema(implementation = TemperatureAlertConfig.class)))
     @ApiResponses(value = {
