@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import ar.edu.iua.TruckTeck.model.Alarm;
 import ar.edu.iua.TruckTeck.model.Order;
 import ar.edu.iua.TruckTeck.model.OrderDetail;
 import ar.edu.iua.TruckTeck.model.TemperatureAlertConfig;
@@ -41,6 +42,9 @@ public class TemperatureAlertConfigBusiness  implements ITemperatureAlertConfigB
 
     @Autowired
     private IOrderBusiness orderBusiness;
+
+    @Autowired
+    private IAlarmBusiness alarmBusiness;
 
     /**
     * Obtiene la configuración única del sistema (siempre id = 1).
@@ -93,12 +97,16 @@ public class TemperatureAlertConfigBusiness  implements ITemperatureAlertConfigB
     /**
      * Resetea el estado de envío de correo para permitir nuevos avisos.
      *
+     * @param id Identificador de la alarma asociada
      * @throws NotFoundException si la configuración no existe
      */
     public void resetEmailSent(Long id)  throws NotFoundException, BusinessException, FoundException {
-        Order order = orderBusiness.load(id);
+        Alarm alarm = alarmBusiness.load(id);
+        Order order = orderBusiness.load(alarm.getOrderNumber());
         order.setTemperatureAlarmSent(false);
+        alarm.setAlarmState(false);
         orderBusiness.update(order);
+        alarmBusiness.update(alarm);
     }
 
     /**
@@ -127,6 +135,15 @@ public class TemperatureAlertConfigBusiness  implements ITemperatureAlertConfigB
         // ¿Superó el umbral?
        if (detail.getTemperature() > threshold) {
            log.info("La temperatura actual (" + detail.getTemperature() + "°C) superó el límite configurado (" + threshold + "°C).");
+           
+           // Guardar la alarma en la base de datos ANTES de enviar emails
+           try {
+               alarmBusiness.saveAlarm(detail, threshold);
+               log.info("Alarma guardada en base de datos para orden {}", detail.getOrder().getNumber());
+           } catch (BusinessException e) {
+               log.error("Error al guardar alarma en BD: {}", e.getMessage(), e);
+               // Continuar con el envío de email aunque falle el guardado
+           }
            
            // Verificamos que existan emails configurados
            if (config.getEmails() == null || config.getEmails().isEmpty()) {
