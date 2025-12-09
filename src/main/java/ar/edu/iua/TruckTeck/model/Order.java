@@ -117,4 +117,8 @@ public class Order {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private OrderState state = OrderState.PENDING; // Estado inicial de la orden por defecto
+
+
+    // ======= Alarma =======
+    private Boolean temperatureAlarmSent = false; // Indica si se envió alarma de temperatura
 }

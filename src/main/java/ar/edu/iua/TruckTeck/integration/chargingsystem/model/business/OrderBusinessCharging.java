@@ -182,14 +182,15 @@ public class OrderBusinessCharging extends OrderBusiness implements IOrderBusine
             // Verifica si la temperatura supera el límite y manda mail si corresponde
             try {
                 log.info("Paso previo al enviar el email");
-                boolean alertSent = temperatureAlertConfigBusiness.checkAndSendAlert(charge.getTemperature());
-                if (alertSent)
-                    messagingTemplate.convertAndSend("/topic/alarm", true);
+                boolean alertSent = temperatureAlertConfigBusiness.checkAndSendAlert(detail);
+                if (alertSent){
+                    order.setTemperatureAlarmSent(true);
+                }
             } catch (Exception e) {
                 log.error("No se pudo verificar alerta de temperatura: " + e.getMessage(), e);
             }
             // Notificar a los suscriptores sobre el nuevo detalle de la orden
-            messagingTemplate.convertAndSend("/topic/detail", detail);
+            messagingTemplate.convertAndSend("/topic/detail/"+detail.getOrder().getNumber(), detail);
 
 		} catch (JsonProcessingException e) {
 			log.error(e.getMessage(), e);

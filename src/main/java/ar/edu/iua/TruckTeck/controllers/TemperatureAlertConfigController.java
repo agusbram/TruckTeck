@@ -6,14 +6,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ar.edu.iua.TruckTeck.model.Alarm;
 import ar.edu.iua.TruckTeck.model.TemperatureAlertConfig;
+import ar.edu.iua.TruckTeck.model.business.IAlarmBusiness;
 import ar.edu.iua.TruckTeck.model.business.ITemperatureAlertConfigBusiness;
+import ar.edu.iua.TruckTeck.model.business.exceptions.BusinessException;
+import ar.edu.iua.TruckTeck.model.business.exceptions.FoundException;
 import ar.edu.iua.TruckTeck.model.business.exceptions.NotFoundException;
 import ar.edu.iua.TruckTeck.util.IStandardResponseBusiness;
 import ar.edu.iua.TruckTeck.util.StandardResponse;
@@ -48,6 +53,9 @@ public class TemperatureAlertConfigController {
 
     @Autowired
     private ITemperatureAlertConfigBusiness temperatureAlertConfigBusiness;
+
+    @Autowired
+    private IAlarmBusiness alarmBusiness;
 
     /**
      * Actualiza la configuración de alerta de temperatura existente.
@@ -95,11 +103,11 @@ public class TemperatureAlertConfigController {
         @ApiResponse(responseCode = "500", description = "Error interno", content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardResponse.class)))
     })
     @PutMapping(value = "/reset-email", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> resetEmailSent() {
+    public ResponseEntity<?> resetEmailSent(@RequestBody Alarm alarm) {
         try {
-            temperatureAlertConfigBusiness.resetEmailSent();
+            temperatureAlertConfigBusiness.resetEmailSent(alarm);
             return new ResponseEntity<>(
-                response.build(HttpStatus.OK, null, "La flag emailAlreadySent fue reseteada correctamente"),
+                response.build(HttpStatus.OK, null, "La flag email AlreadySent fue reseteada correctamente"),
                 HttpStatus.OK
             );
 
@@ -108,6 +116,13 @@ public class TemperatureAlertConfigController {
             response.build(HttpStatus.NOT_FOUND, e, e.getMessage()),
             HttpStatus.NOT_FOUND
             );
+        }
+        catch(BusinessException e) {
+            return new ResponseEntity<>(response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),
+             HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        catch(FoundException e) {
+            return new ResponseEntity<>(response.build(HttpStatus.FOUND, e, e.getMessage()), HttpStatus.FOUND);
         }
     }
 
@@ -140,6 +155,37 @@ public class TemperatureAlertConfigController {
             return new ResponseEntity<>(
                 response.build(HttpStatus.NOT_FOUND, e, e.getMessage()),
                 HttpStatus.NOT_FOUND
+            );
+        }
+    }
+
+    /**
+     * Obtiene todas las alarmas de temperatura registradas en el sistema.
+     *
+     * <p>Devuelve una lista completa de todas las alarmas ordenadas por fecha/hora de evento
+     * en orden descendente (más recientes primero). Cada alarma contiene información sobre
+     * el número de orden, temperatura actual, umbral de temperatura, fecha/hora del evento
+     * y estado de la orden.</p>
+     *
+     * @return {@code 200 OK} con un array de objetos {@link ar.edu.iua.TruckTeck.model.Alarm},
+     *         o {@code 500 Internal Server Error} si ocurre un error durante la consulta.
+     */
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    @Operation(operationId = "list-all-alarms", summary = "Obtiene todas las alarmas de temperatura del sistema.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Devuelve la lista de todas las alarmas ordenadas por fecha/hora descendente.",
+            content = @Content(mediaType = "application/json", schema = @Schema(type = "array", implementation = Alarm.class))),
+        @ApiResponse(responseCode = "500", description = "Error interno durante la consulta.",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardResponse.class)))
+    })
+    @GetMapping(value = "/list")
+    public ResponseEntity<?> listAlarms() {
+        try {
+            return new ResponseEntity<>(alarmBusiness.listAll(), HttpStatus.OK);
+        } catch (BusinessException e) {
+            return new ResponseEntity<>(
+                response.build(HttpStatus.INTERNAL_SERVER_ERROR, e, e.getMessage()),
+                HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
     }

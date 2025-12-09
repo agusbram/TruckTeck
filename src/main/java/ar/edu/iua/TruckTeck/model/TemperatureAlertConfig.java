@@ -32,6 +32,4 @@ public class TemperatureAlertConfig {
     )
     @Column(name = "email")
     private List<String> emails = new ArrayList<>();
-
-    private boolean emailAlreadySent; // evita spam (persistido)
 }
