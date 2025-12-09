@@ -2,14 +2,15 @@ package ar.edu.iua.TruckTeck.model;
 
 import java.time.LocalDateTime;
 
+import ar.edu.iua.TruckTeck.auth.model.User;
 import ar.edu.iua.TruckTeck.model.enums.OrderState;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -100,6 +101,19 @@ public class Alarm {
     /* Estado de la alarma (aceptado o no aceptado) */
     @Column(nullable = false, length = 20)
     private Boolean alarmState = true;
+
+    // Usuario que acepta la alarma
+    @ManyToOne
+    @JoinColumn(name = "user_id") 
+    private User user;
+
+    // Observaciones cuando se acepta la alarma
+    @Column(length = 500)
+    private String observations;
+
+    // Fecha y hora cuando el usuario acepta la alarma
+    @Column(nullable = true)
+    private LocalDateTime acceptedDateTime;
 
     /**
      * Constructor de conveniencia para crear una alarma con todos los datos del evento.

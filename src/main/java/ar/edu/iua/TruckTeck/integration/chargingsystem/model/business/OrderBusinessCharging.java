@@ -184,7 +184,6 @@ public class OrderBusinessCharging extends OrderBusiness implements IOrderBusine
                 log.info("Paso previo al enviar el email");
                 boolean alertSent = temperatureAlertConfigBusiness.checkAndSendAlert(detail);
                 if (alertSent){
-                    messagingTemplate.convertAndSend("/topic/alarm", detail);
                     order.setTemperatureAlarmSent(true);
                 }
             } catch (Exception e) {

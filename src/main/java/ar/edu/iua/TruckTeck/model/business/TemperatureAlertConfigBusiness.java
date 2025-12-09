@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import ar.edu.iua.TruckTeck.auth.model.User;
+import ar.edu.iua.TruckTeck.auth.model.persistence.UserRepository;
 import ar.edu.iua.TruckTeck.model.Alarm;
 import ar.edu.iua.TruckTeck.model.Order;
 import ar.edu.iua.TruckTeck.model.OrderDetail;
@@ -14,6 +16,8 @@ import ar.edu.iua.TruckTeck.model.business.exceptions.FoundException;
 import ar.edu.iua.TruckTeck.model.business.exceptions.NotFoundException;
 import ar.edu.iua.TruckTeck.model.persistence.TemperatureAlertConfigRepository;
 import ar.edu.iua.TruckTeck.util.EmailService;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -45,6 +49,9 @@ public class TemperatureAlertConfigBusiness  implements ITemperatureAlertConfigB
 
     @Autowired
     private IAlarmBusiness alarmBusiness;
+
+    @Autowired
+    private UserRepository userRepository;
 
     /**
     * Obtiene la configuración única del sistema (siempre id = 1).
@@ -100,13 +107,30 @@ public class TemperatureAlertConfigBusiness  implements ITemperatureAlertConfigB
      * @param id Identificador de la alarma asociada
      * @throws NotFoundException si la configuración no existe
      */
-    public void resetEmailSent(Long id)  throws NotFoundException, BusinessException, FoundException {
-        Alarm alarm = alarmBusiness.load(id);
-        Order order = orderBusiness.load(alarm.getOrderNumber());
+    public void resetEmailSent(Alarm alarm)  throws NotFoundException, BusinessException, FoundException {
+
+        Alarm alarmBD = alarmBusiness.load(alarm.getId());
+        Order order = orderBusiness.load(alarmBD.getOrderNumber());
+
+        // Reset de la orden
         order.setTemperatureAlarmSent(false);
-        alarm.setAlarmState(false);
+
+        // Estado de la alarma
+        alarmBD.setAlarmState(false);
+
+        // Cargar el usuario REAL desde la BD
+        if (alarm.getUser() != null && alarm.getUser().getIdUser() != null) {
+            User userBD = userRepository.findById(alarm.getUser().getIdUser()).orElseThrow(() -> new NotFoundException("User no encontrado"));
+            alarmBD.setUser(userBD);
+        }
+
+        // Observaciones y fecha
+        alarmBD.setObservations(alarm.getObservations());
+        alarmBD.setAcceptedDateTime(LocalDateTime.now());
+
+        // Guardar cambios
         orderBusiness.update(order);
-        alarmBusiness.update(alarm);
+        alarmBusiness.update(alarmBD);
     }
 
     /**

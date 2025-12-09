@@ -7,7 +7,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -103,10 +102,10 @@ public class TemperatureAlertConfigController {
         @ApiResponse(responseCode = "404", description = "Configuración no encontrada", content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardResponse.class))),
         @ApiResponse(responseCode = "500", description = "Error interno", content = @Content(mediaType = "application/json", schema = @Schema(implementation = StandardResponse.class)))
     })
-    @PutMapping(value = "/reset-email/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> resetEmailSent(@PathVariable long id) {
+    @PutMapping(value = "/reset-email", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> resetEmailSent(@RequestBody Alarm alarm) {
         try {
-            temperatureAlertConfigBusiness.resetEmailSent(id);
+            temperatureAlertConfigBusiness.resetEmailSent(alarm);
             return new ResponseEntity<>(
                 response.build(HttpStatus.OK, null, "La flag email AlreadySent fue reseteada correctamente"),
                 HttpStatus.OK

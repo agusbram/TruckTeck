@@ -3,6 +3,7 @@ package ar.edu.iua.TruckTeck.model.business;
 
 import java.util.List;
 
+import ar.edu.iua.TruckTeck.model.Alarm;
 import ar.edu.iua.TruckTeck.model.OrderDetail;
 import ar.edu.iua.TruckTeck.model.TemperatureAlertConfig;
 import ar.edu.iua.TruckTeck.model.business.exceptions.BusinessException;
@@ -15,7 +16,7 @@ public interface ITemperatureAlertConfigBusiness {
 
     TemperatureAlertConfig updateConfig(Double threshold, List<String> emails) throws NotFoundException;
 
-    void resetEmailSent(Long id) throws NotFoundException, BusinessException, FoundException;
+    void resetEmailSent(Alarm alarm) throws NotFoundException, BusinessException, FoundException;
 
     boolean checkAndSendAlert(OrderDetail detail) throws NotFoundException;
 
