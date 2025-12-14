@@ -44,34 +44,35 @@ Antes de comenzar, asegúrate de tener lo siguiente instalado:
 ## Configuración del Proyecto
 
 ### Base de Datos
-
 En el archivo `application.properties`, configura la conexión a tu base de datos MySQL. Hay ejemplos para diferentes entornos locales:
 
-# Ejemplo para Agus
-```spring.datasource.url=jdbc:mysql://localhost:3306/iw3_db?createDatabaseIfNotExist=true&verifyServerCertificate=false&useSSL=false&allowPublicKeyRetrieval=true```
-```spring.datasource.username='tu_usuario_bd'```
-```spring.datasource.password='tu_clave_bd'```
-
-
+# Ejemplo
+```
+spring.datasource.url=jdbc:mysql://localhost:3306/iw3_db?createDatabaseIfNotExist=true&verifyServerCertificate=false&useSSL=false&allowPublicKeyRetrieval=true
+spring.datasource.username='tu_usuario_bd'
+spring.datasource.password='tu_clave_bd'```
 
 **Nota**: Asegúrate de ajustar los valores de username y password según tu configuración.
 
 ## Configuración de Correos
-El proyecto utiliza un servidor SMTP para el envío de correos. Configura las credenciales en el archivo application.properties:
-```spring.mail.host=smtp.gmail.com```
-```spring.mail.port=587```
-```spring.mail.username=${MAIL_USERNAME}```
-```spring.mail.password=${MAIL_PASSWORD}```
-```spring.mail.properties.mail.smtp.auth=true```
-```spring.mail.properties.mail.smtp.starttls.enable=true```
+El proyecto utiliza un servidor SMTP para el envío de correos. Configura las credenciales en el archivo ```application.propertie```:
+
+```
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=${MAIL_USERNAME}
+spring.mail.password=${MAIL_PASSWORD}
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true```
 
 **Nota**: Crea un archivo .env en la raíz del proyecto para definir las variables de entorno MAIL_USERNAME y MAIL_PASSWORD.
 
 ## Ejecución del Proyecto
 
 - 1. Clona el repositorio:
-```git clone https://github.com/tu-usuario/truckteck.git```
-```cd truckteck```
+```
+git clone https://github.com/tu-usuario/truckteck.git
+cd truckteck```
 
 - 2. Configura las variables de entorno en un archivo .env (opcional).
 - 3. Ejecuta el proyecto con Maven: 
