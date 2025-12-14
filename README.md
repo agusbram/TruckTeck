@@ -50,7 +50,8 @@ En el archivo `application.properties`, configura la conexión a tu base de dato
 ```
 spring.datasource.url=jdbc:mysql://localhost:3306/iw3_db?createDatabaseIfNotExist=true&verifyServerCertificate=false&useSSL=false&allowPublicKeyRetrieval=true
 spring.datasource.username='tu_usuario_bd'
-spring.datasource.password='tu_clave_bd'```
+spring.datasource.password='tu_clave_bd'
+```
 
 **Nota**: Asegúrate de ajustar los valores de username y password según tu configuración.
 
@@ -63,7 +64,8 @@ spring.mail.port=587
 spring.mail.username=${MAIL_USERNAME}
 spring.mail.password=${MAIL_PASSWORD}
 spring.mail.properties.mail.smtp.auth=true
-spring.mail.properties.mail.smtp.starttls.enable=true```
+spring.mail.properties.mail.smtp.starttls.enable=true
+```
 
 **Nota**: Crea un archivo .env en la raíz del proyecto para definir las variables de entorno MAIL_USERNAME y MAIL_PASSWORD.
 
@@ -72,7 +74,8 @@ spring.mail.properties.mail.smtp.starttls.enable=true```
 - 1. Clona el repositorio:
 ```
 git clone https://github.com/tu-usuario/truckteck.git
-cd truckteck```
+cd truckteck
+```
 
 - 2. Configura las variables de entorno en un archivo .env (opcional).
 - 3. Ejecuta el proyecto con Maven: 
