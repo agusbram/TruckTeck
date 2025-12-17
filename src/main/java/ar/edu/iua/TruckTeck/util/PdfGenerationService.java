@@ -229,10 +229,10 @@ public class PdfGenerationService {
         Cell logoCell = new Cell()
             // Imagen a la derecha
         //     .add(new Image(ImageDataFactory.create("src/main/resources/static/TruckTeck.png"))
-            .add(new Image(ImageDataFactory.create("../../../../../../resources/static/TruckTeck.png"))
-                    .setWidth(80)  // Ancho en puntos
-                    .setHeight(80) // Alto en puntos
-                    .setHorizontalAlignment(HorizontalAlignment.RIGHT))
+        //     .add(new Image(ImageDataFactory.create("../../../../../../resources/static/TruckTeck.png"))
+        //             .setWidth(80)  // Ancho en puntos
+        //             .setHeight(80) // Alto en puntos
+        //             .setHorizontalAlignment(HorizontalAlignment.RIGHT))
                     // .setMarginLeft(20))
 
             // Texto
