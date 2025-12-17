@@ -236,11 +236,11 @@ public class PdfGenerationService {
                     // .setMarginLeft(20))
 
             // Texto
-            .add(new Paragraph("Terminal Management")
-                    .setFont(fontRegular)
-                    .setFontSize(8)
-                    .setTextAlignment(TextAlignment.RIGHT)
-                    .setMarginTop(5))
+        //     .add(new Paragraph("Terminal Management")
+        //             .setFont(fontRegular)
+        //             .setFontSize(8)
+        //             .setTextAlignment(TextAlignment.RIGHT)
+        //             .setMarginTop(5))
 
             .setBorder(Border.NO_BORDER)
             .setVerticalAlignment(VerticalAlignment.MIDDLE)
